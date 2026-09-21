@@ -8,7 +8,7 @@ Built for the Track A challenge, with the optional wallet bonus implemented.
 
 ![Block by Block — the web you can own](assets/social-card.svg)
 
-**Live:** _add your deployment URL here_ · **Stack:** hand-written HTML, CSS and
+**Live:** _add your deployment URL here_ (see [Deploying](#deploying)) · **Stack:** hand-written HTML, CSS and
 vanilla JavaScript. No frameworks, no build step, no dependencies, no trackers.
 
 ---
