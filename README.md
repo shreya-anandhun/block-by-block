@@ -13,7 +13,7 @@ vanilla JavaScript. No frameworks, no build step, no dependencies, no trackers.
 
 ---
 
-## Why this page exists
+## Why this page exists!!
 
 Most Web3 explainers do one of two things: they sell, or they sneer. This one
 tries to *teach* — and the central idea is that you should not have to take any
