@@ -12,3 +12,6 @@ Thumbs.db
 
 # Dependencies (none required — this project is dependency-free)
 node_modules/
+
+# Local preview tooling
+.claude/

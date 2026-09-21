@@ -209,6 +209,14 @@
     views[i].el.dataset.mining = "true";
     statusEl.dataset.state = "working";
 
+    /* Set the status line once. Rewriting it on every frame would re-wrap the
+       toolbar as the number grew, and that layout shift drags the whole page
+       around under the reader. The live counter lives in the block card,
+       where its width cannot move anything else. */
+    statusText.textContent =
+      "Mining block #" + block.index + " — searching for a hash that starts with " +
+      difficulty + " zero" + (difficulty === 1 ? "" : "s");
+
     mining = { cancelled: false };
     var handle = mining;
 
@@ -226,12 +234,10 @@
         }
       }
 
-      /* Keep the read-out honest while the search continues. */
+      /* Keep the block's own read-out honest while the search continues. */
       block.hash = window.sha256(payload(block));
       views[i].nonce.textContent = nonce.toLocaleString();
       views[i].hash.innerHTML = formatHash(block.hash);
-      statusText.textContent =
-        "Mining block #" + block.index + " — " + nonce.toLocaleString() + " hashes tried";
 
       if (nonce >= MAX_NONCE) { finish(); return; }
       requestAnimationFrame(step);

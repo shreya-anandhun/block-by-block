@@ -69,6 +69,9 @@
           <li><a class="site-nav__link" href="#contracts">Contracts</a></li>
           <li><a class="site-nav__link" href="#myths">Myths</a></li>
           <li><a class="site-nav__link" href="#glossary">Glossary</a></li>
+          <!-- The header's "Connect" button is hidden on phones, so the menu
+               carries the link to the wallet section instead. -->
+          <li class="site-nav__item--compact"><a class="site-nav__link" href="#wallet">Connect a wallet</a></li>
         </ul>
       </nav>
 
@@ -536,9 +539,9 @@
         <div class="container">
           <header class="section-head section-head--split">
             <p class="section-head__meta"><span class="label">04 — Line by line</span></p>
-            <h2 class="section-head__title" data-reveal>A whole application, in twenty-four&nbsp;lines</h2>
+            <h2 class="section-head__title" data-reveal>A whole application, in twenty-six&nbsp;lines</h2>
             <p class="prose" data-reveal style="--reveal-delay: 90ms">
-              This is a complete, deployable Solidity contract: a tip jar that accepts money from
+              This is a complete, deployable Solidity contract — twenty-six lines including the blank ones: a tip jar that accepts money from
               anyone and lets only its owner withdraw. Select any highlighted line to read what it
               really does.
             </p>
@@ -574,7 +577,8 @@
 <span class="code-line"> </span>
 <span class="code-line" data-note="access" tabindex="0" role="button">    <span class="tok-key">function</span> <span class="tok-fn">withdraw</span>() <span class="tok-key">external</span> {</span>
 <span class="code-line" data-note="access" tabindex="0" role="button">        <span class="tok-key">require</span>(<span class="tok-key">msg.sender</span> == owner, <span class="tok-str">"not the owner"</span>);</span>
-<span class="code-line" data-note="call" tabindex="0" role="button">        (<span class="tok-type">bool</span> ok, ) = <span class="tok-key">payable</span>(owner).call{value: <span class="tok-key">address</span>(<span class="tok-key">this</span>).balance}(<span class="tok-str">""</span>);</span>
+<span class="code-line" data-note="call" tabindex="0" role="button">        <span class="tok-type">uint256</span> amount = <span class="tok-key">address</span>(<span class="tok-key">this</span>).balance;</span>
+<span class="code-line" data-note="call" tabindex="0" role="button">        (<span class="tok-type">bool</span> ok, ) = <span class="tok-key">payable</span>(owner).call{value: amount}(<span class="tok-str">""</span>);</span>
 <span class="code-line" data-note="call" tabindex="0" role="button">        <span class="tok-key">require</span>(ok, <span class="tok-str">"withdraw failed"</span>);</span>
 <span class="code-line">    }</span>
 <span class="code-line">}</span></code></pre>

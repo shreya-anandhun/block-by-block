@@ -228,6 +228,20 @@
   .site-nav__link::after { display: none; }
 }
 
+/* On the narrowest phones the header runs out of room. The "Connect" call to
+   action is the first thing to go: the wallet section has its own button. */
+/* Only shown once the header's own Connect button drops out. */
+.site-nav__item--compact { display: none; }
+
+@media (max-width: 30rem) {
+  .site-nav__item--compact { display: block; }
+  .site-header__inner { gap: var(--space-xs); }
+  .site-header__actions { margin-inline-start: var(--space-xs); }
+  .site-header__actions .btn--primary { display: none; }
+  .icon-btn,
+  .nav-toggle { width: 2.25rem; height: 2.25rem; }
+}
+
 /* --------------------------------------------------------------------------
    3. Reading-progress chain (fixed left rail, desktop only)
    -------------------------------------------------------------------------- */
