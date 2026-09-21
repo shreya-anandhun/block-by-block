@@ -226,14 +226,6 @@
 
 .hero__art svg { width: 100%; height: auto; overflow: visible; }
 
-.draw {
-  stroke-dasharray: var(--len, 400);
-  stroke-dashoffset: var(--len, 400);
-  animation: draw-in 1.6s var(--ease-out) forwards;
-}
-
-@keyframes draw-in { to { stroke-dashoffset: 0; } }
-
 .float { animation: float 7s var(--ease-in-out) infinite; }
 .float--b { animation-delay: -2.3s; }
 .float--c { animation-delay: -4.6s; }
@@ -245,17 +237,6 @@
 
 .spin-slow { animation: spin 26s linear infinite; transform-origin: center; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-.packet { animation: packet-run 4.5s var(--ease-in-out) infinite; }
-.packet--b { animation-delay: 1.5s; }
-.packet--c { animation-delay: 3s; }
-
-@keyframes packet-run {
-  0%   { offset-distance: 0%;   opacity: 0; }
-  12%  { opacity: 1; }
-  88%  { opacity: 1; }
-  100% { offset-distance: 100%; opacity: 0; }
-}
 
 /* --------------------------------------------------------------------------
    4. Era switcher (Web1 / Web2 / Web3)

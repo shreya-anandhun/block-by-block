@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Block by Block — a field guide to Web3">
+  <rect width="1200" height="630" fill="#f4f1e8"/>
+
+  <!-- ledger grid -->
+  <g stroke="#d7d0be" stroke-width="1" opacity="0.7">
+    <path d="M0 90h1200M0 540h1200"/>
+  </g>
+
+  <!-- wordmark -->
+  <g transform="translate(72 52)">
+    <g fill="none" stroke="#2436c8" stroke-width="3">
+      <rect x="0" y="0" width="17" height="17" rx="2.5"/>
+      <rect x="26" y="0" width="17" height="17" rx="2.5"/>
+      <path d="M17 8.5h9"/>
+    </g>
+    <text x="58" y="14" font-family="Space Grotesk, Helvetica Neue, Arial, sans-serif" font-size="19" font-weight="600" fill="#15140f" letter-spacing="-0.3">Block by Block</text>
+    <text x="205" y="14" font-family="IBM Plex Mono, Menlo, monospace" font-size="12" fill="#837d6c" letter-spacing="2">FIELD GUIDE</text>
+  </g>
+
+  <!-- headline -->
+  <text x="72" y="268" font-family="Space Grotesk, Helvetica Neue, Arial, sans-serif" font-size="96" font-weight="600" fill="#15140f" letter-spacing="-3">The web you can</text>
+  <text x="72" y="374" font-family="Space Grotesk, Helvetica Neue, Arial, sans-serif" font-size="96" font-weight="600" fill="#2436c8" letter-spacing="-3">own.</text>
+  <rect x="72" y="388" width="216" height="8" fill="#2436c8"/>
+
+  <text x="72" y="452" font-family="Inter, Helvetica Neue, Arial, sans-serif" font-size="25" fill="#4c483c">Break a blockchain in your browser. Read a smart contract</text>
+  <text x="72" y="488" font-family="Inter, Helvetica Neue, Arial, sans-serif" font-size="25" fill="#4c483c">line by line. No jargon, no hype.</text>
+
+  <text x="72" y="580" font-family="IBM Plex Mono, Menlo, monospace" font-size="15" fill="#837d6c" letter-spacing="2.5">BLOCKCHAIN · CONTRACTS · TOKENS · DAOS · WALLETS</text>
+
+  <!-- three linked blocks -->
+  <g transform="translate(820 150)">
+    <g fill="#fbf9f3" stroke="#15140f" stroke-width="2.5">
+      <rect x="0" y="0" width="190" height="86" rx="8"/>
+      <rect x="40" y="122" width="190" height="86" rx="8"/>
+      <rect x="80" y="244" width="190" height="86" rx="8"/>
+    </g>
+    <g fill="#837d6c" opacity="0.45">
+      <rect x="20" y="24" width="120" height="7" rx="3.5"/>
+      <rect x="20" y="42" width="84" height="7" rx="3.5"/>
+      <rect x="60" y="146" width="96" height="7" rx="3.5"/>
+      <rect x="60" y="164" width="132" height="7" rx="3.5"/>
+      <rect x="100" y="268" width="128" height="7" rx="3.5"/>
+      <rect x="100" y="286" width="72" height="7" rx="3.5"/>
+    </g>
+    <g fill="#0d7250" opacity="0.7">
+      <rect x="20" y="62" width="150" height="9" rx="4.5"/>
+      <rect x="60" y="184" width="150" height="9" rx="4.5"/>
+    </g>
+    <rect x="100" y="306" width="150" height="9" rx="4.5" fill="#2436c8" opacity="0.7"/>
+    <g stroke="#0d7250" stroke-width="3" stroke-dasharray="6 6" stroke-linecap="round">
+      <path d="M60 86v36"/>
+      <path d="M100 208v36"/>
+    </g>
+  </g>
+</svg>
