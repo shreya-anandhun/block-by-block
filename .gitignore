@@ -1,0 +1,14 @@
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+
+# Dependencies (none required — this project is dependency-free)
+node_modules/
