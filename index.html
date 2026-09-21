@@ -30,15 +30,18 @@
   <link rel="stylesheet" href="css/chain.css" />
   <link rel="stylesheet" href="css/wallet.css" />
 
-  <!-- Apply the saved theme before first paint so the page never flashes. -->
+  <!-- Apply a previously chosen theme before first paint, so the page never
+       flashes. With no stored choice the attribute stays off and the
+       prefers-color-scheme media query in base.css decides on its own — so
+       dark mode still works if this script never runs. -->
   <script>
     (function () {
       try {
         var saved = localStorage.getItem("bxb-theme");
-        var dark = saved ? saved === "dark"
-          : window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (dark) document.documentElement.setAttribute("data-theme", "dark");
-      } catch (e) { /* private mode: fall back to the light default */ }
+        if (saved === "dark" || saved === "light") {
+          document.documentElement.setAttribute("data-theme", saved);
+        }
+      } catch (e) { /* private mode: the media query still applies */ }
     })();
   </script>
 </head>
@@ -359,7 +362,7 @@
             <div class="chain__bar">
               <p class="chain__status" id="chainStatus" data-state="idle">
                 <span class="dot" aria-hidden="true"></span>
-                <span id="chainStatusText">Chain not yet mined</span>
+                <span id="chainStatusText">Not mined yet</span>
               </p>
 
               <label class="chain__difficulty" for="difficulty">
@@ -379,7 +382,7 @@
               <li><span class="num">01</span><span><strong>Hash.</strong> Every block is fed through SHA-256, producing a 64-character fingerprint. Change one character of the data and the fingerprint changes completely.</span></li>
               <li><span class="num">02</span><span><strong>Link.</strong> Each block also stores the <em>previous</em> block's fingerprint. That stored value is what turns a list into a chain.</span></li>
               <li><span class="num">03</span><span><strong>Work.</strong> A block only counts as mined when its hash starts with a run of zeros. The only way to find one is to try nonces until you get lucky — that cost is <em>proof of work</em>.</span></li>
-              <li><span class="num">04</span><span><strong>Tamper.</strong> Rewrite an old block and you must re-mine it and every block after it, faster than the rest of the network adds new ones. On a real chain, that is the expensive part.</span></li>
+              <li><span class="num">04</span><span><strong>Tamper.</strong> Edit block #1 and watch block #2 report a broken link. Re-mine block #1 and it is <em>block #3</em> that breaks next: repairing one block always dislodges the one after it. To rewrite history you have to work forward through the entire chain — faster than the rest of the network adds new blocks. That is the expensive part.</span></li>
             </ol>
 
             <div class="callout callout--accent">

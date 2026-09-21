@@ -79,6 +79,40 @@
   color-scheme: light;
 }
 
+/* Dark theme.
+   The values are declared twice on purpose. The media query makes dark mode
+   work with no JavaScript at all, while the attribute lets the toggle
+   override the system preference in either direction. Neither can be
+   expressed in terms of the other, and a stylesheet is the wrong place to
+   depend on a script having run. */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:        #0f0e0c;
+    --paper-raised: #191713;
+    --paper-sunken: #0a0908;
+
+    --ink:          #f2efe4;
+    --ink-soft:     #b3ad9c;
+    --ink-faint:    #7e786a;
+
+    --rule:         #2e2b24;
+    --rule-strong:  #514c40;
+
+    --accent:       #9aa8ff;
+    --accent-soft:  #1d2140;
+    --signal:       #ff8f5e;
+    --signal-soft:  #35211a;
+    --verify:       #5fd7a6;
+    --verify-soft:  #10291f;
+
+    --shadow-card: 0 1px 0 var(--rule), 0 18px 36px -28px rgba(0, 0, 0, 0.9);
+    --grain-opacity: 0.05;
+
+    color-scheme: dark;
+}
+}
+
 [data-theme="dark"] {
   --paper:        #0f0e0c;
   --paper-raised: #191713;

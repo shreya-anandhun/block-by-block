@@ -17,24 +17,48 @@
      ---------------------------------------------------------------------- */
 
   var themeToggle = document.getElementById("themeToggle");
+  var prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+
+  /* What the page is showing right now: an explicit choice if one was made,
+     otherwise whatever the operating system asked for. */
+  function isDarkNow() {
+    var chosen = root.getAttribute("data-theme");
+    if (chosen === "dark") return true;
+    if (chosen === "light") return false;
+    return prefersDark.matches;
+  }
 
   function applyTheme(isDark) {
-    if (isDark) root.setAttribute("data-theme", "dark");
-    else root.removeAttribute("data-theme");
-
+    /* Always explicit, so the toggle can override the system in either
+       direction rather than only one way. */
+    root.setAttribute("data-theme", isDark ? "dark" : "light");
     themeToggle.setAttribute(
       "aria-label",
       isDark ? "Switch to light theme" : "Switch to dark theme"
     );
   }
 
-  applyTheme(root.getAttribute("data-theme") === "dark");
+  themeToggle.setAttribute(
+    "aria-label",
+    isDarkNow() ? "Switch to light theme" : "Switch to dark theme"
+  );
 
   themeToggle.addEventListener("click", function () {
-    var isDark = root.getAttribute("data-theme") !== "dark";
+    var isDark = !isDarkNow();
     applyTheme(isDark);
     try { localStorage.setItem("bxb-theme", isDark ? "dark" : "light"); } catch (e) { /* private mode */ }
   });
+
+  /* Follow the system while the visitor has not expressed a preference. */
+  if (typeof prefersDark.addEventListener === "function") {
+    prefersDark.addEventListener("change", function () {
+      if (root.hasAttribute("data-theme")) return;
+      themeToggle.setAttribute(
+        "aria-label",
+        prefersDark.matches ? "Switch to light theme" : "Switch to dark theme"
+      );
+    });
+  }
 
   /* ----------------------------------------------------------------------
      2. Navigation

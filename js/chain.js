@@ -55,20 +55,24 @@
     return block.hash.indexOf(target()) === 0;
   }
 
-  /* Recompute hashes from `from` to the end of the chain. Hashes always
-     reflect the current contents, which is what makes tampering visible. */
-  function recompute(from) {
-    for (var i = from; i < blocks.length; i++) {
-      blocks[i].prev = i === 0 ? GENESIS_PREV : blocks[i - 1].hash;
-      blocks[i].hash = window.sha256(payload(blocks[i]));
-    }
+  /* A block's stored previous hash is *data*, not a live pointer: it is written
+     when the block is mined and then stays put. That is the entire mechanism —
+     tamper with an old block and the next block's stored value stops matching
+     what it points at. Auto-updating it would quietly repair the chain and
+     destroy the lesson. */
+  function relink(i) {
+    blocks[i].prev = i === 0 ? GENESIS_PREV : blocks[i - 1].hash;
+  }
+
+  function rehash(i) {
+    blocks[i].hash = window.sha256(payload(blocks[i]));
   }
 
   function build() {
     blocks = SEED.map(function (data, i) {
       return { index: i + 1, data: data, nonce: 0, prev: GENESIS_PREV, hash: "" };
     });
-    recompute(0);
+    for (var i = 0; i < blocks.length; i++) { relink(i); rehash(i); }
   }
 
   /* ----------------------------------------------------------------------
@@ -112,8 +116,8 @@
 
     textarea.addEventListener("input", function () {
       blocks[i].data = textarea.value;
-      recompute(i);
-      render();
+      rehash(i);              /* only this block's fingerprint moves... */
+      render();               /* ...but the next block's stored link now dangles */
     });
 
     el.querySelector('[data-role="mine"]').addEventListener("click", function () {
@@ -140,19 +144,26 @@
   }
 
   function render() {
-    var firstBroken = -1;
+    var firstUnlinked = -1;
+    var anyUnmined = false;
+    var trusted = true;        /* everything after a break is untrustworthy too */
 
     for (var i = 0; i < blocks.length; i++) {
       var block = blocks[i];
       var view = views[i];
       var solved = isSolved(block);
       var linked = i === 0 ? block.prev === GENESIS_PREV : block.prev === blocks[i - 1].hash;
-      var valid = solved && linked;
+      var ok = solved && linked;
 
-      if (!valid && firstBroken === -1) firstBroken = i;
+      if (!solved) anyUnmined = true;
+      if (!linked && firstUnlinked === -1) firstUnlinked = i;
+
+      var valid = ok && trusted;
+      trusted = valid;
 
       view.el.dataset.valid = String(valid);
-      view.state.textContent = valid ? "valid" : solved ? "broken link" : "unmined";
+      view.state.textContent =
+        !solved ? "unmined" : !linked ? "broken link" : !valid ? "after a break" : "valid";
       view.prev.innerHTML = i === 0
         ? '<span style="opacity:.6">' + GENESIS_PREV.slice(0, 32) + "… (genesis)</span>"
         : formatHash(block.prev);
@@ -160,22 +171,30 @@
       view.nonce.textContent = block.nonce.toLocaleString();
     }
 
-    setStatus(firstBroken);
+    setStatus(firstUnlinked, anyUnmined);
   }
 
-  function setStatus(firstBroken) {
+  /* Three states worth telling apart: a chain nobody has mined yet, a chain
+     whose links have actually been broken, and a valid one. Calling a fresh
+     chain "broken" would teach the wrong lesson. */
+  function setStatus(firstUnlinked, anyUnmined) {
     if (mining) return;                       /* the miner owns the status line */
 
-    if (firstBroken === -1) {
+    if (firstUnlinked !== -1) {
+      statusEl.dataset.state = "invalid";
+      statusText.textContent =
+        "Broken at block #" + blocks[firstUnlinked].index +
+        " — the previous hash it stored no longer matches the block before it";
+    } else if (!anyUnmined) {
       statusEl.dataset.state = "valid";
       statusText.textContent =
         "Chain valid — every hash starts with " + difficulty +
         " zero" + (difficulty === 1 ? "" : "s") + " and every link matches";
     } else {
-      statusEl.dataset.state = "invalid";
+      statusEl.dataset.state = "idle";
       statusText.textContent =
-        "Chain broken from block #" + blocks[firstBroken].index +
-        " onwards — re-mine it and everything after it";
+        "Not mined yet — no hash starts with " + difficulty +
+        " zero" + (difficulty === 1 ? "" : "s") + " so far";
     }
   }
 
@@ -200,10 +219,10 @@
     var prefix = target();
     var nonce = 0;
 
-    /* Point at the current previous hash before searching, otherwise we would
-       solve for a link that no longer exists and the result would be thrown
-       away the moment the chain is recomputed. */
-    block.prev = i === 0 ? GENESIS_PREV : blocks[i - 1].hash;
+    /* Re-point at the block before it, then search. Mining is the only thing
+       that rewrites a stored link — which is why fixing a tampered chain has
+       to be done one block at a time, in order. */
+    relink(i);
 
     setBusy(true);
     views[i].el.dataset.mining = "true";
@@ -235,7 +254,7 @@
       }
 
       /* Keep the block's own read-out honest while the search continues. */
-      block.hash = window.sha256(payload(block));
+      rehash(i);
       views[i].nonce.textContent = nonce.toLocaleString();
       views[i].hash.innerHTML = formatHash(block.hash);
 
@@ -246,9 +265,8 @@
     function finish() {
       views[i].el.dataset.mining = "false";
       mining = null;
-      recompute(i);                      /* downstream links now point at a new hash */
       setBusy(false);
-      render();
+      render();                          /* the next block's link is now stale */
 
       if (cascade && i + 1 < blocks.length) mineFrom(i + 1, true);
     }
