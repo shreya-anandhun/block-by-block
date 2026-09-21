@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Block by Block — a field guide to Web3</title>
+  <meta name="description" content="A plain-English field guide to Web3: how blockchains hold together, what smart contracts, tokens, NFTs and DAOs actually are, which myths to drop — and an interactive proof-of-work demo you can break yourself." />
+  <meta name="author" content="Block by Block" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#f4f1e8" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0f0e0c" media="(prefers-color-scheme: dark)" />
+
+  <!-- Open Graph / social preview -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Block by Block — a field guide to Web3" />
+  <meta property="og:description" content="Break a blockchain in your browser, read a smart contract line by line, and connect a wallet. No jargon, no hype." />
+  <meta property="og:image" content="assets/social-card.svg" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- A chain-link favicon, inlined so the page makes no extra request -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232436c8'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='2.2'%3E%3Crect x='6' y='11' width='9' height='10' rx='1.5'/%3E%3Crect x='17' y='11' width='9' height='10' rx='1.5'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/chain.css" />
+  <link rel="stylesheet" href="css/wallet.css" />
+
+  <!-- Apply the saved theme before first paint so the page never flashes. -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("bxb-theme");
+        var dark = saved ? saved === "dark"
+          : window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (dark) document.documentElement.setAttribute("data-theme", "dark");
+      } catch (e) { /* private mode: fall back to the light default */ }
+    })();
+  </script>
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ====================================================================
+       Header
+       ==================================================================== -->
+  <header class="site-header" id="siteHeader">
+    <div class="container site-header__inner">
+      <a class="wordmark" href="#top">
+        <svg class="wordmark__glyph" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2">
+          <rect x="3" y="11" width="10" height="10" rx="1.5" />
+          <rect x="19" y="11" width="10" height="10" rx="1.5" />
+          <path d="M13 16h6" />
+        </svg>
+        <span>Block&nbsp;by&nbsp;Block</span>
+        <span class="wordmark__sub">field guide</span>
+      </a>
+
+      <nav class="site-nav" id="siteNav" aria-label="Sections">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="#shift">The shift</a></li>
+          <li><a class="site-nav__link" href="#chain">Break a chain</a></li>
+          <li><a class="site-nav__link" href="#concepts">Concepts</a></li>
+          <li><a class="site-nav__link" href="#contracts">Contracts</a></li>
+          <li><a class="site-nav__link" href="#myths">Myths</a></li>
+          <li><a class="site-nav__link" href="#glossary">Glossary</a></li>
+        </ul>
+      </nav>
+
+      <div class="site-header__actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Switch to dark theme">
+          <svg class="icon-btn__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4" />
+          </svg>
+          <svg class="icon-btn__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z" />
+          </svg>
+        </button>
+
+        <a class="btn btn--primary btn--small" href="#wallet">
+          <span class="dot dot--live" aria-hidden="true"></span>
+          Connect
+        </a>
+
+        <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="Open menu">
+          <span class="nav-toggle__bars" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Reading progress: one diamond per section, filled as you pass it -->
+  <nav class="progress-rail" id="progressRail" aria-label="Reading progress">
+    <a class="progress-rail__link" href="#top" data-rail="top"><span class="progress-rail__block"></span><span class="visually-hidden">Top</span></a>
+    <span class="progress-rail__tether" aria-hidden="true"></span>
+    <a class="progress-rail__link" href="#shift" data-rail="shift"><span class="progress-rail__block"></span><span class="visually-hidden">The shift</span></a>
+    <span class="progress-rail__tether" aria-hidden="true"></span>
+    <a class="progress-rail__link" href="#chain" data-rail="chain"><span class="progress-rail__block"></span><span class="visually-hidden">Break a chain</span></a>
+    <span class="progress-rail__tether" aria-hidden="true"></span>
+    <a class="progress-rail__link" href="#concepts" data-rail="concepts"><span class="progress-rail__block"></span><span class="visually-hidden">Concepts</span></a>
+    <span class="progress-rail__tether" aria-hidden="true"></span>
+    <a class="progress-rail__link" href="#contracts" data-rail="contracts"><span class="progress-rail__block"></span><span class="visually-hidden">Contracts</span></a>
+    <span class="progress-rail__tether" aria-hidden="true"></span>
+    <a class="progress-rail__link" href="#myths" data-rail="myths"><span class="progress-rail__block"></span><span class="visually-hidden">Myths</span></a>
+    <span class="progress-rail__tether" aria-hidden="true"></span>
+    <a class="progress-rail__link" href="#wallet" data-rail="wallet"><span class="progress-rail__block"></span><span class="visually-hidden">Wallet</span></a>
+    <span class="progress-rail__tether" aria-hidden="true"></span>
+    <a class="progress-rail__link" href="#glossary" data-rail="glossary"><span class="progress-rail__block"></span><span class="visually-hidden">Glossary</span></a>
+  </nav>
+
+  <div class="shell">
+    <main id="main">
+
+      <!-- ==================================================================
+           Hero
+           ================================================================== -->
+      <section class="hero" id="top">
+        <div class="container hero__grid">
+          <div class="hero__copy">
+            <p class="hero__kicker">
+              <span class="badge"><span class="dot dot--live" aria-hidden="true"></span> Field guide · 2026 edition</span>
+            </p>
+
+            <h1 class="hero__title">The web you can&nbsp;<em>own</em>.</h1>
+
+            <p class="lede">
+              Web2 asked you to trust a company's database. Web3 replaces it with a public
+              ledger that thousands of strangers keep a copy of — and nobody can quietly edit.
+              Here is how that actually works, in plain English, including the parts that
+              still don't work well.
+            </p>
+
+            <div class="hero__actions">
+              <a class="btn btn--primary" href="#chain">
+                <svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <rect x="2" y="8" width="8" height="8" rx="1.5" />
+                  <rect x="14" y="8" width="8" height="8" rx="1.5" />
+                  <path d="M10 12h4" />
+                </svg>
+                Break a blockchain
+              </a>
+              <a class="btn" href="#shift">Start from the beginning</a>
+            </div>
+
+            <dl class="hero__stats">
+              <div class="stat">
+                <dt class="stat__label">Bitcoin's genesis block — the first link in the first chain</dt>
+                <dd class="stat__value">2009</dd>
+              </div>
+              <div class="stat">
+                <dt class="stat__label">One slot on Ethereum: how often a new block is proposed</dt>
+                <dd class="stat__value">~12<span class="unit">s</span></dd>
+              </div>
+              <div class="stat">
+                <dt class="stat__label">Energy Ethereum stopped using when it left proof of work in 2022</dt>
+                <dd class="stat__value">99.9<span class="unit">%</span></dd>
+              </div>
+              <div class="stat">
+                <dt class="stat__label">Permissions you need to read the whole ledger yourself</dt>
+                <dd class="stat__value">0</dd>
+              </div>
+            </dl>
+          </div>
+
+          <!-- Hero artwork: one ledger, many identical copies -->
+          <div class="hero__art" aria-hidden="false">
+            <svg id="heroArt" viewBox="0 0 560 470" role="img" aria-labelledby="heroArtTitle heroArtDesc">
+              <title id="heroArtTitle">A distributed ledger</title>
+              <desc id="heroArtDesc">Eight peer nodes arranged in a ring, connected to each other, each holding an identical copy of the same three-block chain drawn at the centre. Small packets of data travel along the connections.</desc>
+
+              <defs>
+                <path id="chord1" d="M84 235 C 200 120, 360 120, 476 235" />
+                <path id="chord2" d="M141 373 C 240 300, 320 300, 419 96" />
+                <path id="chord3" d="M280 431 C 380 380, 440 320, 419 373" />
+                <path id="chord4" d="M280 39 C 160 60, 110 140, 141 96" />
+              </defs>
+
+              <!-- Peer ring -->
+              <g class="spin-slow">
+                <circle cx="280" cy="235" r="196" fill="none" stroke="var(--rule)" stroke-width="1.5" stroke-dasharray="3 9" />
+              </g>
+
+              <!-- Peer-to-peer connections -->
+              <g fill="none" stroke="var(--rule-strong)" stroke-width="1" opacity="0.35">
+                <use href="#chord1" /><use href="#chord2" /><use href="#chord3" /><use href="#chord4" />
+              </g>
+
+              <!-- Travelling data packets -->
+              <g fill="var(--accent)">
+                <circle r="4"><animateMotion dur="5s" repeatCount="indefinite"><mpath href="#chord1" /></animateMotion></circle>
+                <circle r="4"><animateMotion dur="6.5s" begin="1.2s" repeatCount="indefinite"><mpath href="#chord2" /></animateMotion></circle>
+                <circle r="3"><animateMotion dur="5.8s" begin="2.4s" repeatCount="indefinite"><mpath href="#chord3" /></animateMotion></circle>
+                <circle r="3"><animateMotion dur="7s" begin="0.6s" repeatCount="indefinite"><mpath href="#chord4" /></animateMotion></circle>
+              </g>
+
+              <!-- Nodes: every one of these keeps the same copy -->
+              <g stroke="var(--rule-strong)" stroke-width="1.6" fill="var(--paper)">
+                <circle cx="476" cy="235" r="8" /><circle cx="419" cy="96"  r="8" />
+                <circle cx="280" cy="39"  r="8" /><circle cx="141" cy="96"  r="8" />
+                <circle cx="84"  cy="235" r="8" /><circle cx="141" cy="373" r="8" />
+                <circle cx="280" cy="431" r="8" /><circle cx="419" cy="373" r="8" />
+              </g>
+
+              <!-- The chain itself -->
+              <g class="float">
+                <rect x="186" y="112" width="128" height="78" rx="6" fill="var(--paper-raised)" stroke="var(--rule-strong)" stroke-width="1.8" />
+                <text x="200" y="136" font-family="IBM Plex Mono, monospace" font-size="12" fill="var(--ink-faint)">BLOCK #1</text>
+                <rect x="200" y="146" width="84" height="5" rx="2.5" fill="var(--ink-faint)" opacity="0.4" />
+                <rect x="200" y="158" width="62" height="5" rx="2.5" fill="var(--ink-faint)" opacity="0.4" />
+                <rect x="200" y="172" width="100" height="6" rx="3" fill="var(--verify)" opacity="0.55" />
+              </g>
+
+              <g class="float float--b">
+                <rect x="216" y="206" width="128" height="78" rx="6" fill="var(--paper-raised)" stroke="var(--rule-strong)" stroke-width="1.8" />
+                <text x="230" y="230" font-family="IBM Plex Mono, monospace" font-size="12" fill="var(--ink-faint)">BLOCK #2</text>
+                <rect x="230" y="240" width="72" height="5" rx="2.5" fill="var(--ink-faint)" opacity="0.4" />
+                <rect x="230" y="252" width="90" height="5" rx="2.5" fill="var(--ink-faint)" opacity="0.4" />
+                <rect x="230" y="266" width="100" height="6" rx="3" fill="var(--verify)" opacity="0.55" />
+              </g>
+
+              <g class="float float--c">
+                <rect x="246" y="300" width="128" height="78" rx="6" fill="var(--paper-raised)" stroke="var(--rule-strong)" stroke-width="1.8" />
+                <text x="260" y="324" font-family="IBM Plex Mono, monospace" font-size="12" fill="var(--ink-faint)">BLOCK #3</text>
+                <rect x="260" y="334" width="94" height="5" rx="2.5" fill="var(--ink-faint)" opacity="0.4" />
+                <rect x="260" y="346" width="58" height="5" rx="2.5" fill="var(--ink-faint)" opacity="0.4" />
+                <rect x="260" y="360" width="100" height="6" rx="3" fill="var(--accent)" opacity="0.55" />
+              </g>
+
+              <!-- Hash tethers between blocks -->
+              <g fill="none" stroke="var(--verify)" stroke-width="2" stroke-linecap="round">
+                <path d="M250 190 L 250 206" stroke-dasharray="4 4" />
+                <path d="M280 284 L 280 300" stroke-dasharray="4 4" />
+              </g>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           01 · The shift
+           ================================================================== -->
+      <section class="section" id="shift" data-section>
+        <div class="container">
+          <header class="section-head section-head--split">
+            <p class="section-head__meta"><span class="label">01 — The shift</span></p>
+            <h2 class="section-head__title" data-reveal>Three webs, one&nbsp;question: who holds the database?</h2>
+            <p class="prose" data-reveal style="--reveal-delay: 90ms">
+              Each era of the web added a verb. Web1 let you read it. Web2 let you write to it.
+              Web3 adds the ability to <strong>own</strong> something on it — an asset, an identity,
+              a vote — without a company holding the record on your behalf.
+            </p>
+          </header>
+
+          <div class="era" data-reveal>
+            <div class="era__tabs" role="tablist" aria-label="Eras of the web">
+              <button class="era__tab" role="tab" id="tab-web1" aria-controls="panel-web1" aria-selected="false" type="button">
+                <span class="era__tab-year">1991–2004</span>
+                <span class="era__tab-name">Web1</span>
+              </button>
+              <button class="era__tab" role="tab" id="tab-web2" aria-controls="panel-web2" aria-selected="false" type="button">
+                <span class="era__tab-year">2004–now</span>
+                <span class="era__tab-name">Web2</span>
+              </button>
+              <button class="era__tab" role="tab" id="tab-web3" aria-controls="panel-web3" aria-selected="true" type="button">
+                <span class="era__tab-year">2015–now</span>
+                <span class="era__tab-name">Web3</span>
+              </button>
+            </div>
+
+            <!-- Web1 -->
+            <div class="era__panel" role="tabpanel" id="panel-web1" aria-labelledby="tab-web1" tabindex="0" hidden>
+              <p class="era__verb"><span class="is-on">Read</span> <span>· Write · Own</span></p>
+              <p class="prose">
+                The document web. Pages sat on a server, you fetched them, and that was the
+                whole interaction. Publishing meant knowing HTML and renting hosting, so most
+                people were an audience rather than authors.
+              </p>
+              <dl class="era__facts">
+                <div class="era__fact"><dt>Shape</dt><dd>Static pages, directories, personal sites</dd></div>
+                <div class="era__fact"><dt>You are</dt><dd>A reader</dd></div>
+                <div class="era__fact"><dt>Who holds it</dt><dd>Whoever runs the server the page lives on</dd></div>
+                <div class="era__fact"><dt>The catch</dt><dd>Almost nobody could publish, and nothing talked to anything else</dd></div>
+              </dl>
+            </div>
+
+            <!-- Web2 -->
+            <div class="era__panel" role="tabpanel" id="panel-web2" aria-labelledby="tab-web2" tabindex="0" hidden>
+              <p class="era__verb"><span class="is-on">Read · Write</span> <span>· Own</span></p>
+              <p class="prose">
+                The platform web, and the one you are almost certainly using right now.
+                Anyone can post, and it is free — because the account, the followers and the
+                archive are entries in a company's private database, and attention is the product.
+              </p>
+              <dl class="era__facts">
+                <div class="era__fact"><dt>Shape</dt><dd>Social feeds, marketplaces, SaaS, app stores</dd></div>
+                <div class="era__fact"><dt>You are</dt><dd>A user — and an account that can be suspended</dd></div>
+                <div class="era__fact"><dt>Who holds it</dt><dd>The platform: your posts, your graph, your reach, your reviews</dd></div>
+                <div class="era__fact"><dt>The catch</dt><dd>The rules, the fees and the API can change overnight, and you cannot take the audience with you</dd></div>
+              </dl>
+            </div>
+
+            <!-- Web3 -->
+            <div class="era__panel" role="tabpanel" id="panel-web3" aria-labelledby="tab-web3" tabindex="0">
+              <p class="era__verb"><span class="is-on">Read · Write · Own</span></p>
+              <p class="prose">
+                The ownership web. The state that matters — who owns what, who voted how,
+                who is owed what — moves out of a private database and into a
+                <span class="term">blockchain</span> that anyone can read and nobody can silently
+                rewrite. Control comes from holding a key, not from holding an account.
+              </p>
+              <dl class="era__facts">
+                <div class="era__fact"><dt>Shape</dt><dd>Wallets, smart contracts, tokens, DAOs, on-chain identity</dd></div>
+                <div class="era__fact"><dt>You are</dt><dd>An address — and the only person who can sign for it</dd></div>
+                <div class="era__fact"><dt>Who holds it</dt><dd>Everyone. Thousands of independent nodes keep the same copy</dd></div>
+                <div class="era__fact"><dt>The catch</dt><dd>Slower, costlier, less forgiving. Lose the key and there is no reset link</dd></div>
+              </dl>
+            </div>
+          </div>
+
+          <div class="callout" data-reveal style="margin-top: var(--space-l)">
+            <svg class="callout__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" /><path d="M12 8v5" /><path d="M12 16.5v.01" />
+            </svg>
+            <p class="callout__body">
+              <strong>Reality check.</strong> Web3 does not replace Web2 — almost every real
+              product is a hybrid. The interface you are looking at is ordinary HTML served
+              from an ordinary web host. Only the part that has to be
+              <em>ownable and verifiable</em> is worth the cost of putting on a chain.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           02 · Break a chain
+           ================================================================== -->
+      <section class="section" id="chain" data-section>
+        <div class="container">
+          <header class="section-head section-head--split">
+            <p class="section-head__meta"><span class="label">02 — Hands on</span></p>
+            <h2 class="section-head__title" data-reveal>Why a blockchain is hard to&nbsp;lie&nbsp;to</h2>
+            <p class="prose" data-reveal style="--reveal-delay: 90ms">
+              This is not a diagram. Four real blocks are being hashed with <strong>SHA-256</strong>
+              in your browser. Mine them, then edit any block's data and watch every block after
+              it break — that is tamper-evidence, and it is the whole trick.
+            </p>
+          </header>
+
+          <div class="chain" data-reveal>
+            <div class="chain__bar">
+              <p class="chain__status" id="chainStatus" data-state="idle">
+                <span class="dot" aria-hidden="true"></span>
+                <span id="chainStatusText">Chain not yet mined</span>
+              </p>
+
+              <label class="chain__difficulty" for="difficulty">
+                Difficulty
+                <input type="range" id="difficulty" min="1" max="5" value="3" step="1" />
+                <output id="difficultyOut" for="difficulty">3 zeros</output>
+              </label>
+
+              <button class="btn btn--small" id="mineAll" type="button">Mine all blocks</button>
+              <button class="btn btn--small btn--ghost" id="resetChain" type="button">Reset</button>
+            </div>
+
+            <!-- Blocks are rendered by js/chain.js so the markup stays in one place -->
+            <div class="chain__track" id="chainTrack" role="list" aria-label="Blocks in the demo chain"></div>
+
+            <ol class="chain__legend">
+              <li><span class="num">01</span><span><strong>Hash.</strong> Every block is fed through SHA-256, producing a 64-character fingerprint. Change one character of the data and the fingerprint changes completely.</span></li>
+              <li><span class="num">02</span><span><strong>Link.</strong> Each block also stores the <em>previous</em> block's fingerprint. That stored value is what turns a list into a chain.</span></li>
+              <li><span class="num">03</span><span><strong>Work.</strong> A block only counts as mined when its hash starts with a run of zeros. The only way to find one is to try nonces until you get lucky — that cost is <em>proof of work</em>.</span></li>
+              <li><span class="num">04</span><span><strong>Tamper.</strong> Rewrite an old block and you must re-mine it and every block after it, faster than the rest of the network adds new ones. On a real chain, that is the expensive part.</span></li>
+            </ol>
+
+            <div class="callout callout--accent">
+              <svg class="callout__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z" />
+              </svg>
+              <p class="callout__body">
+                Drag difficulty to 5 and mine again to feel the curve: each extra zero makes the
+                search about <strong>16× harder</strong>. Bitcoin currently needs roughly
+                <strong>19–20 leading zeros</strong>, which is why it takes the entire network about
+                ten minutes to find one block. Ethereum stopped doing this work in 2022 and now
+                picks proposers by <span class="term">stake</span> instead.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           03 · Core concepts
+           ================================================================== -->
+      <section class="section" id="concepts" data-section>
+        <div class="container">
+          <header class="section-head section-head--split">
+            <p class="section-head__meta"><span class="label">03 — The vocabulary</span></p>
+            <h2 class="section-head__title" data-reveal>Six ideas that carry all the&nbsp;weight</h2>
+            <p class="prose" data-reveal style="--reveal-delay: 90ms">
+              Nearly every Web3 headline is one of these six things wearing a costume.
+              Learn them once and the rest of the jargon becomes readable.
+            </p>
+          </header>
+
+          <div class="grid grid--3">
+
+            <article class="concept" data-reveal>
+              <span class="concept__index mono">01</span>
+              <svg class="concept__icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <circle cx="24" cy="10" r="5" /><circle cx="10" cy="34" r="5" /><circle cx="38" cy="34" r="5" />
+                <circle cx="24" cy="24" r="3.2" fill="currentColor" stroke="none" opacity="0.35" />
+                <path d="M24 15v6M20.8 25.6 13.4 30.4M27.2 25.6l7.4 4.8M15 34h18" stroke-dasharray="3 3" />
+              </svg>
+              <h3 class="concept__title">Decentralisation</h3>
+              <p class="concept__body">
+                No head office. Thousands of independent computers each keep a full copy of the
+                ledger and independently check every rule. To change the record you would have to
+                convince most of them at once, and they have no reason to agree with you.
+              </p>
+              <p class="concept__meta"><span>Cost</span><span>Slow &amp; redundant by design</span></p>
+            </article>
+
+            <article class="concept" data-reveal style="--reveal-delay: 80ms">
+              <span class="concept__index mono">02</span>
+              <svg class="concept__icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <path d="M6 30h8l4-14 6 24 5-19 4 9h9" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="6" cy="30" r="2.4" fill="currentColor" stroke="none" />
+                <circle cx="42" cy="30" r="2.4" fill="currentColor" stroke="none" />
+              </svg>
+              <h3 class="concept__title">Consensus</h3>
+              <p class="concept__body">
+                How strangers who distrust each other agree on one history.
+                <strong>Proof of work</strong> makes you spend electricity to propose a block.
+                <strong>Proof of stake</strong> makes you lock up capital that gets destroyed —
+                "slashed" — if you cheat. Both make lying more expensive than honesty.
+              </p>
+              <p class="concept__meta"><span>Ethereum</span><span>Proof of stake since 2022</span></p>
+            </article>
+
+            <article class="concept" data-reveal style="--reveal-delay: 160ms">
+              <span class="concept__index mono">03</span>
+              <svg class="concept__icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <rect x="10" y="6" width="28" height="36" rx="3" />
+                <path d="M17 17h14M17 24h14M17 31h8" stroke-linecap="round" />
+                <path d="m28 34 4 4 7-8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <h3 class="concept__title">Smart contracts</h3>
+              <p class="concept__body">
+                Programs deployed to an address instead of a server. Every node runs the same code
+                on the same input and gets the same result, so the outcome needs no referee.
+                They can hold and move funds — and once deployed, a bug is usually permanent.
+              </p>
+              <p class="concept__meta"><span>Written in</span><span>Solidity, Vyper, Rust</span></p>
+            </article>
+
+            <article class="concept" data-reveal>
+              <span class="concept__index mono">04</span>
+              <svg class="concept__icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <circle cx="18" cy="24" r="12" /><path d="M30 12.6a12 12 0 0 1 0 22.8" stroke-dasharray="3 3" />
+                <path d="M18 18v12M14.5 21h7M14.5 27h7" stroke-linecap="round" />
+              </svg>
+              <h3 class="concept__title">Tokens &amp; NFTs</h3>
+              <p class="concept__body">
+                A token is just a balance inside a contract's ledger.
+                <strong>Fungible</strong> ones (ERC-20) are interchangeable, like currency.
+                <strong>Non-fungible</strong> ones (ERC-721) are numbered and unique — the NFT is
+                the row saying address X owns item #7, not the picture itself.
+              </p>
+              <p class="concept__meta"><span>Remember</span><span>A token is a record, not a file</span></p>
+            </article>
+
+            <article class="concept" data-reveal style="--reveal-delay: 80ms">
+              <span class="concept__index mono">05</span>
+              <svg class="concept__icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <circle cx="24" cy="24" r="17" stroke-dasharray="4 4" />
+                <circle cx="24" cy="15" r="3.5" /><circle cx="16" cy="30" r="3.5" /><circle cx="32" cy="30" r="3.5" />
+                <path d="M24 18.5 17 27M31 27l-7-8.5M19.5 30h9" />
+              </svg>
+              <h3 class="concept__title">DAOs</h3>
+              <p class="concept__body">
+                An organisation whose bank account and bylaws are code. Members hold governance
+                tokens, proposals are voted on in the open, and a passing vote can execute itself
+                against the treasury. Useful — and a reminder that votes follow tokens, so whoever
+                holds the most tokens holds the most power.
+              </p>
+              <p class="concept__meta"><span>Watch for</span><span>Voter apathy &amp; whale control</span></p>
+            </article>
+
+            <article class="concept" data-reveal style="--reveal-delay: 160ms">
+              <span class="concept__index mono">06</span>
+              <svg class="concept__icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <rect x="6" y="12" width="36" height="26" rx="4" />
+                <path d="M6 20h36" /><circle cx="34" cy="29" r="3" />
+                <path d="M14 6h20l-3 6" stroke-linejoin="round" />
+              </svg>
+              <h3 class="concept__title">Wallets &amp; keys</h3>
+              <p class="concept__body">
+                A wallet holds no coins. It holds a <strong>private key</strong>; your address is
+                derived from its public half, and the balance lives on the chain. Signing with the
+                key is the only way to move anything — which is why the 12-word recovery phrase
+                <em>is</em> the money.
+              </p>
+              <p class="concept__meta"><span>Rule</span><span>Never share a seed phrase</span></p>
+            </article>
+          </div>
+
+          <!-- A second tier of concepts, deliberately styled as footnotes -->
+          <div class="grid grid--3" style="margin-top: var(--space-l)">
+            <div class="contract__note" data-reveal>
+              <h4>Layer 2</h4>
+              <p>Ethereum is slow and expensive on purpose. <strong>Rollups</strong> like Arbitrum, Optimism and Base batch thousands of transactions off-chain, then post a compressed proof back to Ethereum — cheap fees, while still inheriting Ethereum's security.</p>
+            </div>
+            <div class="contract__note" data-reveal style="--reveal-delay: 80ms">
+              <h4>Oracles</h4>
+              <p>A contract cannot see the outside world; it has no internet access. <strong>Oracles</strong> such as Chainlink push outside data — prices, scores, weather — on-chain so contracts can react to it. Whoever feeds the oracle becomes a point of trust.</p>
+            </div>
+            <div class="contract__note" data-reveal style="--reveal-delay: 160ms">
+              <h4>Stablecoins</h4>
+              <p>Tokens pegged to a currency, usually the dollar, so people can transact without price swings. Most (USDC, USDT) are backed by reserves at a real company — which quietly reintroduces exactly the kind of trusted third party the system was built to avoid.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           04 · Read a smart contract
+           ================================================================== -->
+      <section class="section" id="contracts" data-section>
+        <div class="container">
+          <header class="section-head section-head--split">
+            <p class="section-head__meta"><span class="label">04 — Line by line</span></p>
+            <h2 class="section-head__title" data-reveal>A whole application, in twenty-four&nbsp;lines</h2>
+            <p class="prose" data-reveal style="--reveal-delay: 90ms">
+              This is a complete, deployable Solidity contract: a tip jar that accepts money from
+              anyone and lets only its owner withdraw. Select any highlighted line to read what it
+              really does.
+            </p>
+          </header>
+
+          <div class="contract">
+            <div class="code-card" data-reveal>
+              <div class="code-card__bar">
+                <span class="dot" aria-hidden="true"></span>
+                <span class="dot" aria-hidden="true"></span>
+                <span class="dot" aria-hidden="true"></span>
+                <span>TipJar.sol</span>
+              </div>
+
+              <pre class="code-card__body"><code id="contractCode"><span class="code-line tok-com">// SPDX-License-Identifier: MIT</span>
+<span class="code-line" data-note="pragma" tabindex="0" role="button"><span class="tok-key">pragma</span> solidity ^0.8.24;</span>
+<span class="code-line"> </span>
+<span class="code-line"><span class="tok-key">contract</span> <span class="tok-fn">TipJar</span> {</span>
+<span class="code-line" data-note="owner" tabindex="0" role="button">    <span class="tok-type">address</span> <span class="tok-key">public immutable</span> owner;</span>
+<span class="code-line" data-note="mapping" tabindex="0" role="button">    <span class="tok-key">mapping</span>(<span class="tok-type">address</span> =&gt; <span class="tok-type">uint256</span>) <span class="tok-key">public</span> tipped;</span>
+<span class="code-line"> </span>
+<span class="code-line" data-note="event" tabindex="0" role="button">    <span class="tok-key">event</span> <span class="tok-fn">Tipped</span>(<span class="tok-type">address</span> <span class="tok-key">indexed</span> from, <span class="tok-type">uint256</span> amount);</span>
+<span class="code-line"> </span>
+<span class="code-line" data-note="constructor" tabindex="0" role="button">    <span class="tok-key">constructor</span>() {</span>
+<span class="code-line" data-note="constructor" tabindex="0" role="button">        owner = <span class="tok-key">msg.sender</span>;</span>
+<span class="code-line">    }</span>
+<span class="code-line"> </span>
+<span class="code-line" data-note="payable" tabindex="0" role="button">    <span class="tok-key">function</span> <span class="tok-fn">tip</span>() <span class="tok-key">external payable</span> {</span>
+<span class="code-line" data-note="require" tabindex="0" role="button">        <span class="tok-key">require</span>(<span class="tok-key">msg.value</span> &gt; 0, <span class="tok-str">"send something"</span>);</span>
+<span class="code-line" data-note="mapping" tabindex="0" role="button">        tipped[<span class="tok-key">msg.sender</span>] += <span class="tok-key">msg.value</span>;</span>
+<span class="code-line" data-note="event" tabindex="0" role="button">        <span class="tok-key">emit</span> <span class="tok-fn">Tipped</span>(<span class="tok-key">msg.sender</span>, <span class="tok-key">msg.value</span>);</span>
+<span class="code-line">    }</span>
+<span class="code-line"> </span>
+<span class="code-line" data-note="access" tabindex="0" role="button">    <span class="tok-key">function</span> <span class="tok-fn">withdraw</span>() <span class="tok-key">external</span> {</span>
+<span class="code-line" data-note="access" tabindex="0" role="button">        <span class="tok-key">require</span>(<span class="tok-key">msg.sender</span> == owner, <span class="tok-str">"not the owner"</span>);</span>
+<span class="code-line" data-note="call" tabindex="0" role="button">        (<span class="tok-type">bool</span> ok, ) = <span class="tok-key">payable</span>(owner).call{value: <span class="tok-key">address</span>(<span class="tok-key">this</span>).balance}(<span class="tok-str">""</span>);</span>
+<span class="code-line" data-note="call" tabindex="0" role="button">        <span class="tok-key">require</span>(ok, <span class="tok-str">"withdraw failed"</span>);</span>
+<span class="code-line">    }</span>
+<span class="code-line">}</span></code></pre>
+            </div>
+
+            <div class="contract__notes" data-reveal style="--reveal-delay: 100ms">
+              <div class="contract__note" id="note-default">
+                <h4>How to read this</h4>
+                <p>
+                  Select a highlighted line on the left. Everything here is public: once this
+                  contract is deployed, anyone can read its code, its storage and every tip it has
+                  ever received — no API key, no permission, no takedown.
+                </p>
+              </div>
+
+              <div class="contract__note" id="note-pragma" hidden>
+                <h4>Version lock</h4>
+                <p>
+                  Pins the compiler version. Solidity changes meaningfully between releases, and a
+                  contract that compiles differently can behave differently — so the version it was
+                  audited against gets written into the source.
+                </p>
+              </div>
+
+              <div class="contract__note" id="note-owner" hidden>
+                <h4>An address is an identity</h4>
+                <p>
+                  <code>address</code> is a 20-byte account — a person's wallet or another contract.
+                  <code>immutable</code> means this one is fixed at deployment and can never be
+                  changed, not even by the owner. <code>public</code> makes Solidity generate a free
+                  read function for it automatically.
+                </p>
+              </div>
+
+              <div class="contract__note" id="note-mapping" hidden>
+                <h4>Storage that lives forever</h4>
+                <p>
+                  A <code>mapping</code> is the contract's database table: address → amount tipped.
+                  It is stored on-chain, replicated by every node, and persists between calls.
+                  That permanence is exactly why writing to storage costs gas.
+                </p>
+              </div>
+
+              <div class="contract__note" id="note-event" hidden>
+                <h4>Events are the receipt</h4>
+                <p>
+                  Contracts cannot push notifications, so they emit <strong>events</strong> into the
+                  transaction log. Apps and block explorers listen for them. Logs are far cheaper
+                  than storage, but contracts cannot read their own events back.
+                </p>
+              </div>
+
+              <div class="contract__note" id="note-constructor" hidden>
+                <h4>Runs exactly once</h4>
+                <p>
+                  The constructor executes at deployment and is then discarded.
+                  <code>msg.sender</code> is whoever sent the current transaction — here, the person
+                  deploying — so the deployer becomes the permanent owner.
+                </p>
+              </div>
+
+              <div class="contract__note" id="note-payable" hidden>
+                <h4>Money is a first-class type</h4>
+                <p>
+                  <code>payable</code> lets a function receive ETH; without it the transfer reverts.
+                  <code>external</code> means only the outside world can call it. Value arrives with
+                  the call itself — there is no separate payment step and no card network in between.
+                </p>
+              </div>
+
+              <div class="contract__note" id="note-require" hidden>
+                <h4>All or nothing</h4>
+                <p>
+                  <code>require</code> is a guard. If the condition fails the whole transaction is
+                  <strong>reverted</strong> — every state change is rolled back as if it never
+                  happened, and the caller still pays for the gas already burned trying.
+                </p>
+              </div>
+
+              <div class="contract__note" id="note-access" hidden>
+                <h4>Access control is manual</h4>
+                <p>
+                  There are no logins here. "Only the owner" is something you have to write
+                  yourself, on every single function that needs it. Forgetting this one line is
+                  one of the most common — and most expensive — bugs in the industry.
+                </p>
+              </div>
+
+              <div class="contract__note" id="note-call" hidden>
+                <h4>Sending ETH, carefully</h4>
+                <p>
+                  Modern Solidity sends value with <code>.call</code> rather than the older
+                  <code>.transfer</code>, because <code>.transfer</code> caps the gas forwarded and
+                  breaks for wallets that are themselves contracts. <code>.call</code> returns a
+                  success flag instead of throwing, so it must be checked — hence the
+                  <code>require</code> on the next line.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           05 · Myths
+           ================================================================== -->
+      <section class="section" id="myths" data-section>
+        <div class="container">
+          <header class="section-head section-head--split">
+            <p class="section-head__meta"><span class="label">05 — Reality check</span></p>
+            <h2 class="section-head__title" data-reveal>Six things "everyone&nbsp;knows" that aren't&nbsp;true</h2>
+            <p class="prose" data-reveal style="--reveal-delay: 90ms">
+              Web3 attracts overclaiming from its fans and lazy dismissal from its critics.
+              Select a card to turn it over.
+            </p>
+          </header>
+
+          <div class="grid grid--3">
+
+            <div class="myth" role="button" tabindex="0" aria-pressed="false" data-reveal>
+              <div class="myth__inner">
+                <div class="myth__face">
+                  <span class="myth__flag">Myth 01</span>
+                  <h3>"Web3 is just cryptocurrency."</h3>
+                  <p>If you have seen one Web3 story, it was probably about a coin going up or down.</p>
+                  <span class="myth__hint">Flip for the reality →</span>
+                </div>
+                <div class="myth__face myth__face--back">
+                  <span class="myth__flag">Reality</span>
+                  <p>
+                    Currency was the first application, not the point. The underlying primitive is a
+                    shared database with built-in ownership rules — used for provenance, identity,
+                    governance, ticketing and settlement. Tokens are the unit of account that makes
+                    those records transferable.
+                  </p>
+                  <span class="myth__hint">← Flip back</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="myth" role="button" tabindex="0" aria-pressed="false" data-reveal style="--reveal-delay: 70ms">
+              <div class="myth__inner">
+                <div class="myth__face">
+                  <span class="myth__flag">Myth 02</span>
+                  <h3>"Blockchains are anonymous."</h3>
+                  <p>No name, no email, just a string of hex. Surely that means untraceable?</p>
+                  <span class="myth__hint">Flip for the reality →</span>
+                </div>
+                <div class="myth__face myth__face--back">
+                  <span class="myth__flag">Reality</span>
+                  <p>
+                    <strong>Pseudonymous</strong>, not anonymous — and permanently public. Every
+                    transaction you ever make is visible to everyone forever. Link an address to a
+                    name once, through an exchange sign-up or a single careless payment, and the
+                    entire history behind it is retroactively de-anonymised.
+                  </p>
+                  <span class="myth__hint">← Flip back</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="myth" role="button" tabindex="0" aria-pressed="false" data-reveal style="--reveal-delay: 140ms">
+              <div class="myth__inner">
+                <div class="myth__face">
+                  <span class="myth__flag">Myth 03</span>
+                  <h3>"Buying an NFT means owning the artwork."</h3>
+                  <p>You paid for the picture, so the picture is yours. Right?</p>
+                  <span class="myth__hint">Flip for the reality →</span>
+                </div>
+                <div class="myth__face myth__face--back">
+                  <span class="myth__flag">Reality</span>
+                  <p>
+                    You own a <strong>token</strong>: a record in a contract that points at a file.
+                    Copyright stays with the creator unless the licence explicitly transfers it, and
+                    the file itself usually sits on IPFS or an ordinary web server. If that host
+                    disappears, the token survives and the image does not.
+                  </p>
+                  <span class="myth__hint">← Flip back</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="myth" role="button" tabindex="0" aria-pressed="false" data-reveal>
+              <div class="myth__inner">
+                <div class="myth__face">
+                  <span class="myth__flag">Myth 04</span>
+                  <h3>"Blockchains inevitably burn enormous energy."</h3>
+                  <p>The one statistic everybody remembers: a single transaction, a household's electricity.</p>
+                  <span class="myth__hint">Flip for the reality →</span>
+                </div>
+                <div class="myth__face myth__face--back">
+                  <span class="myth__flag">Reality</span>
+                  <p>
+                    That is <strong>proof of work</strong> specifically. When Ethereum switched to
+                    proof of stake in September 2022 its energy use fell by roughly
+                    <strong>99.95%</strong> overnight. Bitcoin still mines, and it is fair to
+                    criticise. The consensus mechanism decides the footprint — not the idea of a
+                    blockchain.
+                  </p>
+                  <span class="myth__hint">← Flip back</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="myth" role="button" tabindex="0" aria-pressed="false" data-reveal style="--reveal-delay: 70ms">
+              <div class="myth__inner">
+                <div class="myth__face">
+                  <span class="myth__flag">Myth 05</span>
+                  <h3>"A smart contract is a legal contract."</h3>
+                  <p>It has the word contract in it, and it is signed. Close enough?</p>
+                  <span class="myth__hint">Flip for the reality →</span>
+                </div>
+                <div class="myth__face myth__face--back">
+                  <span class="myth__flag">Reality</span>
+                  <p>
+                    It is neither smart nor a contract — it is a program that executes automatically.
+                    It has no notion of intent, fairness or force majeure, and no judge to appeal to.
+                    If the code does something the author never meant, the code still wins. Real
+                    agreements increasingly pair the two: code for settlement, law for everything else.
+                  </p>
+                  <span class="myth__hint">← Flip back</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="myth" role="button" tabindex="0" aria-pressed="false" data-reveal style="--reveal-delay: 140ms">
+              <div class="myth__inner">
+                <div class="myth__face">
+                  <span class="myth__flag">Myth 06</span>
+                  <h3>"It's decentralised, so nobody can shut it down."</h3>
+                  <p>Thousands of nodes, no company, no off switch.</p>
+                  <span class="myth__hint">Flip for the reality →</span>
+                </div>
+                <div class="myth__face myth__face--back">
+                  <span class="myth__flag">Reality</span>
+                  <p>
+                    Decentralisation is a <strong>spectrum</strong>, and most projects sit further
+                    along it than they claim. The website is hosted somewhere. The wallet talks to
+                    the chain through a handful of RPC providers. Many contracts keep an admin key
+                    or an upgradeable proxy. Worth asking of any project: what exactly is
+                    decentralised, and who still holds the keys?
+                  </p>
+                  <span class="myth__hint">← Flip back</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           06 · Wallet (optional bonus)
+           ================================================================== -->
+      <section class="section" id="wallet" data-section>
+        <div class="container">
+          <header class="section-head section-head--split">
+            <p class="section-head__meta"><span class="label">06 — Try it</span></p>
+            <h2 class="section-head__title" data-reveal>Say hello with a&nbsp;wallet</h2>
+            <p class="prose" data-reveal style="--reveal-delay: 90ms">
+              A "log in" with no email, no password and no account. Your browser wallet proves you
+              control an address, and this page reads back what the chain already says about it.
+              Nothing is sent anywhere — every value below comes straight from your wallet's own
+              node connection.
+            </p>
+          </header>
+
+          <div class="wallet">
+            <div class="wallet__panel" data-reveal>
+              <div class="wallet__head">
+                <span class="label">Connection</span>
+                <span class="wallet__status" id="walletStatus" data-state="idle">
+                  <span class="dot" aria-hidden="true"></span>
+                  <span id="walletStatusText">Not connected</span>
+                </span>
+              </div>
+
+              <div class="wallet__identity">
+                <div class="wallet__avatar" id="walletAvatar" aria-hidden="true"></div>
+                <div>
+                  <p class="wallet__address mono" id="walletAddress">0x000…0000</p>
+                  <p class="wallet__hint" id="walletHint">
+                    Your public address — safe to share. It is derived from your public key.
+                  </p>
+                </div>
+              </div>
+
+              <dl class="wallet__readouts">
+                <div class="readout">
+                  <dt class="readout__key">Network</dt>
+                  <dd class="readout__value" id="walletNetwork">—</dd>
+                </div>
+                <div class="readout">
+                  <dt class="readout__key">Chain ID</dt>
+                  <dd class="readout__value" id="walletChainId">—</dd>
+                </div>
+                <div class="readout">
+                  <dt class="readout__key">Balance</dt>
+                  <dd class="readout__value" id="walletBalance">—</dd>
+                </div>
+              </dl>
+
+              <div class="wallet__actions">
+                <button class="btn btn--primary" id="connectBtn" type="button">
+                  <svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="2" y="6" width="20" height="14" rx="3" /><path d="M2 11h20" /><circle cx="17.5" cy="15.5" r="1.4" />
+                  </svg>
+                  <span id="connectBtnText">Connect wallet</span>
+                </button>
+                <button class="btn btn--ghost" id="copyBtn" type="button" hidden>Copy address</button>
+                <button class="btn btn--ghost" id="disconnectBtn" type="button" hidden>Disconnect</button>
+                <span class="copy-flash" id="copyFlash" role="status">Copied</span>
+              </div>
+
+              <p class="wallet__message" id="walletMessage" role="status" aria-live="polite"></p>
+
+              <div class="wallet__providers" id="walletProviders" hidden>
+                <p class="label">Choose a wallet</p>
+                <!-- Populated from EIP-6963 announcements -->
+              </div>
+            </div>
+
+            <div class="wallet__safety" data-reveal style="--reveal-delay: 100ms">
+              <h3>What just happened</h3>
+              <ul class="safety-list">
+                <li>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12 5 5L20 6" /></svg>
+                  <span><strong>No password was created.</strong> The page asked your wallet for permission; the wallet returned the address it is willing to reveal. That is the entire handshake.</span>
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12 5 5L20 6" /></svg>
+                  <span><strong>Your key never moved.</strong> Private keys never leave the wallet. Websites can only ever <em>ask</em> it to sign something — and you approve or reject each request.</span>
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12 5 5L20 6" /></svg>
+                  <span><strong>Connecting costs nothing.</strong> Reading the chain is free and takes no gas. Only transactions that change state are paid for.</span>
+                </li>
+                <li data-tone="warn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 1.5 21h21L12 3Z" /><path d="M12 10v4M12 17.5v.01" /></svg>
+                  <span><strong>No legitimate site will ever ask for your seed phrase.</strong> Not for support, not to "verify", not to "sync". Anyone who asks is stealing from you. This page never will — it has no field to type one into.</span>
+                </li>
+                <li data-tone="warn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 1.5 21h21L12 3Z" /><path d="M12 10v4M12 17.5v.01" /></svg>
+                  <span><strong>Read what you sign.</strong> A signature request that grants unlimited spending approval looks almost identical to a harmless one. If a prompt is confusing, reject it — rejecting is always free.</span>
+                </li>
+              </ul>
+
+              <div class="callout">
+                <svg class="callout__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" /><path d="M12 8v5" /><path d="M12 16.5v.01" />
+                </svg>
+                <p class="callout__body">
+                  <strong>No wallet installed?</strong> The demo is entirely optional — everything
+                  else on this page works without one. If you want to try it, install
+                  <a href="https://metamask.io/download/" target="_blank" rel="noopener noreferrer">MetaMask</a>
+                  and consider pointing it at a <span class="term">testnet</span> such as Sepolia,
+                  where the money is fake.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           07 · Glossary
+           ================================================================== -->
+      <section class="section" id="glossary" data-section>
+        <div class="container">
+          <header class="section-head section-head--split">
+            <p class="section-head__meta"><span class="label">07 — Decoder</span></p>
+            <h2 class="section-head__title" data-reveal>The words people use without explaining&nbsp;them</h2>
+            <p class="prose" data-reveal style="--reveal-delay: 90ms">
+              Ten terms that show up in every thread, every whitepaper and every scam.
+            </p>
+          </header>
+
+          <div class="glossary" data-reveal>
+            <details class="glossary__item">
+              <summary>
+                <span class="glossary__term">Address</span>
+                <span class="glossary__pron">0x + 40 hex characters</span>
+                <span class="glossary__sign" aria-hidden="true"></span>
+              </summary>
+              <div class="glossary__body">
+                <p>Your public account number, derived from your public key. Sharing it is safe — it is how people send you things. An address that holds code instead of a person behind it is a <strong>contract account</strong>; both look identical from the outside.</p>
+              </div>
+            </details>
+
+            <details class="glossary__item">
+              <summary>
+                <span class="glossary__term">Gas &amp; gwei</span>
+                <span class="glossary__pron">/ɡas/ · /ˈɡwaɪ/</span>
+                <span class="glossary__sign" aria-hidden="true"></span>
+              </summary>
+              <div class="glossary__body">
+                <p><strong>Gas</strong> measures computational work: every operation has a fixed price, so a busy transaction costs more than a simple transfer. You pay for gas in <strong>gwei</strong>, one billionth of an ETH (<code>1 gwei = 0.000000001 ETH</code>). Since 2021 most of that fee is <em>burned</em> rather than paid to anyone — a deliberate brake on the fee market.</p>
+              </div>
+            </details>
+
+            <details class="glossary__item">
+              <summary>
+                <span class="glossary__term">EVM</span>
+                <span class="glossary__pron">Ethereum Virtual Machine</span>
+                <span class="glossary__sign" aria-hidden="true"></span>
+              </summary>
+              <div class="glossary__body">
+                <p>The shared computer that every node simulates in lockstep. Contract code compiles to EVM bytecode, and because every node runs it identically, they all agree on the result. So many chains copied it that "EVM-compatible" became a feature: the same contract deploys unchanged to Polygon, Base, Arbitrum and dozens of others.</p>
+              </div>
+            </details>
+
+            <details class="glossary__item">
+              <summary>
+                <span class="glossary__term">Seed phrase</span>
+                <span class="glossary__pron">12 or 24 ordinary words</span>
+                <span class="glossary__sign" aria-hidden="true"></span>
+              </summary>
+              <div class="glossary__body">
+                <p>A human-readable encoding of the master secret your whole wallet is generated from. Type it into a new wallet anywhere in the world and every account comes back. This is why it must go on paper in a drawer, never in a screenshot, a password manager note, or a chat window — and why nobody trustworthy will ever ask you for it.</p>
+              </div>
+            </details>
+
+            <details class="glossary__item">
+              <summary>
+                <span class="glossary__term">Node</span>
+                <span class="glossary__pron">also: RPC provider</span>
+                <span class="glossary__sign" aria-hidden="true"></span>
+              </summary>
+              <div class="glossary__body">
+                <p>A computer running the chain's software, keeping a copy of the ledger and validating every rule. Anyone can run one. Most apps do not — they talk to a hosted node through an <strong>RPC</strong> endpoint from providers like Infura or Alchemy, which is one of the quiet centralisation points of the whole ecosystem.</p>
+              </div>
+            </details>
+
+            <details class="glossary__item">
+              <summary>
+                <span class="glossary__term">Mempool</span>
+                <span class="glossary__pron">the waiting room</span>
+                <span class="glossary__sign" aria-hidden="true"></span>
+              </summary>
+              <div class="glossary__body">
+                <p>Where transactions sit after you broadcast them and before they are included in a block. It is public, so everyone can see what you are about to do — which is how <strong>front-running</strong> works: a bot spots your trade, pays a higher fee, and gets in first.</p>
+              </div>
+            </details>
+
+            <details class="glossary__item">
+              <summary>
+                <span class="glossary__term">Finality</span>
+                <span class="glossary__pron">when it is really done</span>
+                <span class="glossary__sign" aria-hidden="true"></span>
+              </summary>
+              <div class="glossary__body">
+                <p>A confirmed transaction is not instantly permanent. Under proof of work it just becomes exponentially harder to reverse with each new block. Ethereum's proof of stake adds explicit finality: after roughly 13 minutes a block is economically irreversible, because undoing it would require destroying billions of dollars of staked ETH.</p>
+              </div>
+            </details>
+
+            <details class="glossary__item">
+              <summary>
+                <span class="glossary__term">Testnet</span>
+                <span class="glossary__pron">e.g. Sepolia</span>
+                <span class="glossary__sign" aria-hidden="true"></span>
+              </summary>
+              <div class="glossary__body">
+                <p>A parallel copy of the network where the coins are worthless and you get them free from a "faucet". It behaves like the real thing, so it is where every developer — and every sensible beginner — should make their first mistakes.</p>
+              </div>
+            </details>
+
+            <details class="glossary__item">
+              <summary>
+                <span class="glossary__term">Bridge</span>
+                <span class="glossary__pron">chain → chain</span>
+                <span class="glossary__sign" aria-hidden="true"></span>
+              </summary>
+              <div class="glossary__body">
+                <p>Chains cannot talk to each other natively, so bridges lock an asset on one chain and mint a representation of it on another. They concentrate enormous value in a single contract, which has made them the most-robbed component in the entire industry — billions lost across a handful of hacks.</p>
+              </div>
+            </details>
+
+            <details class="glossary__item">
+              <summary>
+                <span class="glossary__term">Rug pull</span>
+                <span class="glossary__pron">the exit scam</span>
+                <span class="glossary__sign" aria-hidden="true"></span>
+              </summary>
+              <div class="glossary__body">
+                <p>A project takes money, then the team drains the liquidity and vanishes. Because transfers are irreversible and pseudonymous, there is nobody to call. The tells are consistent: anonymous team, unaudited contract, guaranteed returns, an urgent deadline, and a contract the owner can still change.</p>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ====================================================================
+         Footer
+         ==================================================================== -->
+    <footer class="site-footer">
+      <div class="container">
+        <div class="site-footer__grid">
+          <div class="site-footer__col">
+            <a class="wordmark" href="#top" style="margin-bottom: var(--space-s)">
+              <svg class="wordmark__glyph" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2">
+                <rect x="3" y="11" width="10" height="10" rx="1.5" />
+                <rect x="19" y="11" width="10" height="10" rx="1.5" />
+                <path d="M13 16h6" />
+              </svg>
+              <span>Block by Block</span>
+            </a>
+            <p class="wallet__hint" style="margin-top: var(--space-s)">
+              An independent, beginner-friendly field guide to the decentralised web.
+              No token, nothing for sale, no affiliation with any project mentioned.
+            </p>
+          </div>
+
+          <div class="site-footer__col">
+            <h4>Sections</h4>
+            <ul class="link-list">
+              <li><a href="#shift">The shift</a></li>
+              <li><a href="#chain">Break a chain</a></li>
+              <li><a href="#concepts">Core concepts</a></li>
+              <li><a href="#contracts">Read a contract</a></li>
+              <li><a href="#myths">Myths</a></li>
+              <li><a href="#wallet">Connect a wallet</a></li>
+              <li><a href="#glossary">Glossary</a></li>
+            </ul>
+          </div>
+
+          <div class="site-footer__col">
+            <h4>Go deeper</h4>
+            <ul class="link-list">
+              <li><a href="https://ethereum.org/en/developers/docs/" target="_blank" rel="noopener noreferrer">Ethereum developer docs</a></li>
+              <li><a href="https://bitcoin.org/bitcoin.pdf" target="_blank" rel="noopener noreferrer">The Bitcoin whitepaper (2008)</a></li>
+              <li><a href="https://docs.soliditylang.org/" target="_blank" rel="noopener noreferrer">Solidity documentation</a></li>
+              <li><a href="https://etherscan.io/" target="_blank" rel="noopener noreferrer">Etherscan — read the chain</a></li>
+              <li><a href="https://eips.ethereum.org/EIPS/eip-1193" target="_blank" rel="noopener noreferrer">EIP-1193 — the wallet API</a></li>
+            </ul>
+          </div>
+
+          <div class="site-footer__col">
+            <h4>Stay safe</h4>
+            <ul class="link-list">
+              <li><a href="https://support.metamask.io/privacy-and-security/staying-safe-in-web3/" target="_blank" rel="noopener noreferrer">Staying safe in Web3</a></li>
+              <li><a href="https://revoke.cash/" target="_blank" rel="noopener noreferrer">Review token approvals</a></li>
+              <li><a href="https://ethereum.org/en/security/" target="_blank" rel="noopener noreferrer">Ethereum security basics</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="site-footer__baseline">
+          <p>Built with hand-written HTML, CSS and vanilla JavaScript. No frameworks, no build step, no trackers.</p>
+          <p class="mono">Educational content only — not financial advice.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/sha256.js" defer></script>
+  <script src="js/chain.js" defer></script>
+  <script src="js/wallet.js" defer></script>
+  <script src="js/main.js" defer></script>
+</body>
+</html>

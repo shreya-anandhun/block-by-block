@@ -514,12 +514,11 @@
 
 .myth {
   perspective: 1400px;
-  min-height: 15rem;
-  background: none;
-  border: none;
-  padding: 0;
-  text-align: left;
+  min-height: 16rem;
   width: 100%;
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .myth__inner {
@@ -676,3 +675,8 @@
 @media (prefers-reduced-motion: reduce) {
   [data-reveal] { opacity: 1; transform: none; }
 }
+
+/* Hero statistic: the value is shown above its label, but the markup keeps
+   the <dt> (label) before the <dd> (value) as the HTML spec requires. */
+.stat { display: flex; flex-direction: column-reverse; }
+.stat__value .unit { color: var(--ink-faint); font-size: 0.62em; margin-left: 0.05em; }
