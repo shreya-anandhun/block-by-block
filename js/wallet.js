@@ -1,5 +1,5 @@
 /* ==========================================================================
-   wallet.js — optional browser-wallet connection
+   wallet.js - optional browser-wallet connection
    --------------------------------------------------------------------------
    Talks to the wallet directly over EIP-1193 (`request`, `on`) with no
    library. Wallets are discovered with EIP-6963, the announcement standard
@@ -91,7 +91,7 @@
 
   /* A deterministic identicon: the address bytes decide which cells of a
      mirrored 5x5 grid are filled, and the hue. Same address, same picture,
-     everywhere — the same idea wallets use for their little avatars. */
+     everywhere - the same idea wallets use for their little avatars. */
   function drawAvatar(address) {
     var clean = address.replace(/^0x/, "").toLowerCase();
     var hue = parseInt(clean.slice(0, 6), 16) % 360;
@@ -111,8 +111,8 @@
 
     avatarEl.innerHTML =
       '<svg viewBox="0 0 5 5" width="100%" height="100%" shape-rendering="crispEdges" aria-hidden="true">' +
-        '<rect width="5" height="5" fill="hsl(' + hue + ' 70% 94%)"/>' +
-        '<g fill="hsl(' + hue + ' 72% 42%)">' + cells + "</g>" +
+        '<rect width="5" height="5" style="fill:var(--gold-soft)"/>' +
+        '<g style="fill:var(--accent)">' + cells + "</g>" +
       "</svg>";
   }
 
@@ -127,24 +127,36 @@
       var frac = (wei % 1000000000000000000n).toString().padStart(18, "0").slice(0, 4);
       return whole.toString() + "." + frac;
     } catch (error) {
-      return "—";
+      return "…";
     }
   }
 
+  /* Before a real wallet connects, the panel shows a clearly labelled
+     sample wallet so visitors can see what the read-outs look like. */
+  var DEMO = {
+    address: "0x7a3F9c2E41b8D6e0F1a2B3c4D5e6F7a8b41D9c2E",
+    network: "Ethereum",
+    chainId: "1",
+    balance: "1.2458"
+  };
+  var activityEl = document.getElementById("walletActivity");
+
   function showDisconnected() {
     account = null;
-    setStatus("idle", "Not connected");
-    addressEl.textContent = "0x000…0000";
-    addressEl.style.opacity = "0.4";
-    hintEl.textContent = "Your public address — safe to share. It is derived from your public key.";
-    networkEl.textContent = "—";
-    chainIdEl.textContent = "—";
-    balanceEl.textContent = "—";
+    setStatus("demo", "Demo wallet");
+    addressEl.textContent = shorten(DEMO.address);
+    addressEl.title = "Sample address";
+    addressEl.style.opacity = "1";
+    hintEl.textContent = "Sample values so you can see what a connected wallet shows. Connect your own to see your real ones.";
+    networkEl.textContent = DEMO.network;
+    chainIdEl.textContent = DEMO.chainId;
+    balanceEl.innerHTML = DEMO.balance + ' <span class="unit">ETH</span>';
     connectText.textContent = "Connect wallet";
     connectBtn.hidden = false;
     disconnectBtn.hidden = true;
     copyBtn.hidden = true;
-    clearAvatar();
+    if (activityEl) activityEl.hidden = false;
+    drawAvatar(DEMO.address);
   }
 
   function showConnected(address) {
@@ -157,6 +169,10 @@
     connectBtn.hidden = true;
     disconnectBtn.hidden = false;
     copyBtn.hidden = false;
+    if (activityEl) activityEl.hidden = true;
+    networkEl.textContent = "…";
+    chainIdEl.textContent = "…";
+    balanceEl.textContent = "…";
     drawAvatar(address);
   }
 
@@ -205,7 +221,7 @@
     provider.on("chainChanged", function () {
       /* The account stays valid across a network switch; only the read-outs
          need refreshing. Reloading the page here is the common shortcut. */
-      say("Network switched — re-reading the chain.", null);
+      say("Network switched. Re-reading the chain.", null);
       refreshChainData();
     });
   }
@@ -223,7 +239,7 @@
 
     attach(provider);
     setStatus("pending", "Waiting for you");
-    say("Check your wallet — it is asking whether to reveal your address to this page.");
+    say("Check your wallet: it is asking whether to reveal your address to this page.");
     connectBtn.disabled = true;
     connectText.textContent = "Check your wallet…";
 
@@ -231,13 +247,13 @@
       if (!accounts || !accounts.length) throw { code: 4001 };
       showConnected(accounts[0]);
       refreshChainData();
-      say("Connected. No password, no sign-up, no data sent anywhere — your wallet simply vouched for you.", "success");
+      say("Connected. No password, no sign-up, no data sent anywhere. Your wallet simply vouched for you.", "success");
       providersEl.hidden = true;
     }).catch(function (error) {
       var code = error && error.code;
       if (code === 4001) {
-        say("Request rejected — which is exactly the right instinct when you are not sure. Nothing happened.", null);
-        setStatus("idle", "Not connected");
+        say("Request rejected, which is exactly the right instinct when you are not sure. Nothing happened.", null);
+        showDisconnected();
       } else if (code === -32002) {
         say("Your wallet already has a pending request. Open the extension and answer it first.", "error");
         setStatus("pending", "Request pending");
@@ -285,7 +301,7 @@
   disconnectBtn.addEventListener("click", function () {
     var provider = active;
     showDisconnected();
-    say("Disconnected from this page. The permission itself lives in your wallet — remove this site there to revoke it fully.");
+    say("Disconnected from this page. The permission itself lives in your wallet, so remove this site there to revoke it fully.");
 
     if (provider && provider.request) {
       provider.request({
@@ -301,7 +317,7 @@
       copyFlash.classList.add("is-on");
       setTimeout(function () { copyFlash.classList.remove("is-on"); }, 1600);
     }).catch(function () {
-      say("Clipboard blocked by the browser — the full address is " + account);
+      say("Clipboard blocked by the browser. The full address is " + account);
     });
   });
 
@@ -315,9 +331,9 @@
      is already authorised. eth_accounts never prompts. */
   setTimeout(function () {
     if (!hasAnyWallet()) {
-      setStatus("idle", "No wallet detected");
+      setStatus("demo", "Demo wallet · no extension found");
       say(
-        'This browser has no wallet extension. The section is optional — or install ' +
+        'This browser has no wallet extension. The section is optional, or install ' +
         '<a href="https://metamask.io/download/" target="_blank" rel="noopener noreferrer">MetaMask</a> to try it.'
       );
       return;
@@ -330,7 +346,7 @@
       if (accounts && accounts.length) {
         showConnected(accounts[0]);
         refreshChainData();
-        say("Reconnected automatically — you already granted this page permission.", "success");
+        say("Reconnected automatically: you already granted this page permission.", "success");
       }
     }).catch(function () { /* wallet locked or unavailable: stay disconnected */ });
   }, 350);

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   wallet.css — the optional MetaMask / EIP-1193 connection panel
+   wallet.css - the optional MetaMask / EIP-1193 connection panel
    ========================================================================== */
 
 .wallet {
@@ -84,7 +84,7 @@
 }
 
 .wallet__address {
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-size: var(--step-1);
   letter-spacing: -0.02em;
   word-break: break-all;
@@ -118,7 +118,7 @@
 }
 
 .readout__value {
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-size: var(--step-0);
   margin-top: 0.2rem;
   font-variant-numeric: tabular-nums;
@@ -202,3 +202,55 @@
 }
 
 .copy-flash.is-on { opacity: 1; }
+
+/* Demo wallet: sample values and activity */
+.wallet__status[data-state="demo"] { color: var(--accent); }
+.wallet__activity[hidden] { display: none; }
+.wallet__activity {
+  padding: var(--space-s) var(--space-m);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper);
+}
+.wallet__activity-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+.wallet__demo {
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--gold);
+  color: #0b0b09;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.wallet__activity ul { display: grid; gap: 0.2rem; }
+.wallet__activity li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  transition: background-color var(--dur-fast), transform var(--dur-mid) var(--ease-out);
+  animation: rise-in 500ms var(--ease-out) both;
+}
+.wallet__activity li:nth-child(2) { animation-delay: 80ms; }
+.wallet__activity li:nth-child(3) { animation-delay: 160ms; }
+.wallet__activity li:nth-child(4) { animation-delay: 240ms; }
+.wallet__activity li:hover { background: var(--gold-soft); transform: translateX(4px); }
+.wtx {
+  display: grid;
+  place-items: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 9px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: var(--gold-soft);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--gold) 50%, var(--rule));
+}
+.wtx--in { background: var(--gold); color: #0b0b09; border-color: var(--gold); }
+.wtx__what { color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wtx__amt { font-family: var(--font-code); font-size: 0.8rem; color: var(--ink); font-variant-numeric: tabular-nums; }

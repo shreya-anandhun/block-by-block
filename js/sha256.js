@@ -1,8 +1,8 @@
 /* ==========================================================================
-   sha256.js — a small, synchronous SHA-256
+   sha256.js - a small, synchronous SHA-256
    --------------------------------------------------------------------------
    The browser ships crypto.subtle.digest, but it is asynchronous and is only
-   available in a secure context — so it fails silently when someone opens
+   available in a secure context - so it fails silently when someone opens
    index.html straight from disk. The chain demo needs to hash hundreds of
    thousands of times while staying responsive, so a plain synchronous
    implementation of FIPS 180-4 is the better fit here.
@@ -14,7 +14,7 @@
   "use strict";
 
   /* First 32 bits of the fractional parts of the cube roots of the first
-     64 primes — the SHA-256 round constants. */
+     64 primes - the SHA-256 round constants. */
   var K = new Uint32Array([
     0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
     0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,

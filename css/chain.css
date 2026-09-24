@@ -1,5 +1,5 @@
 /* ==========================================================================
-   chain.css — the interactive proof-of-work chain demo
+   chain.css - the interactive proof-of-work chain demo
    ========================================================================== */
 
 .chain {
@@ -193,7 +193,7 @@
   border: 1px solid var(--rule);
   border-radius: var(--radius);
   background: var(--paper);
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-size: 0.78rem;
   line-height: 1.5;
   transition: border-color var(--dur-fast) var(--ease-out);
@@ -202,7 +202,7 @@
 .block__data:focus-visible { border-color: var(--accent); }
 
 .block__hash {
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-size: 0.72rem;
   line-height: 1.45;
   overflow-wrap: anywhere;   /* breaks the long hex run, but not "(genesis)" */

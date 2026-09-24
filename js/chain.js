@@ -1,8 +1,8 @@
 /* ==========================================================================
-   chain.js — the interactive proof-of-work chain
+   chain.js - the interactive proof-of-work chain
    --------------------------------------------------------------------------
    Four blocks are hashed live in the browser. Each block stores the previous
-   block's hash, so editing an old block invalidates every block after it —
+   block's hash, so editing an old block invalidates every block after it -
    the point of the whole exercise.
 
    Mining runs in requestAnimationFrame slices rather than a tight loop, so
@@ -56,7 +56,7 @@
   }
 
   /* A block's stored previous hash is *data*, not a live pointer: it is written
-     when the block is mined and then stays put. That is the entire mechanism —
+     when the block is mined and then stays put. That is the entire mechanism -
      tamper with an old block and the next block's stored value stops matching
      what it points at. Auto-updating it would quietly repair the chain and
      destroy the lesson. */
@@ -92,7 +92,7 @@
       "</div>" +
 
       '<div class="block__field">' +
-        '<label class="block__key" for="blockData' + i + '">Data — try editing it</label>' +
+        '<label class="block__key" for="blockData' + i + '">Data (try editing it)</label>' +
         '<textarea class="block__data" id="blockData' + i + '" spellcheck="false"></textarea>' +
       "</div>" +
 
@@ -184,16 +184,16 @@
       statusEl.dataset.state = "invalid";
       statusText.textContent =
         "Broken at block #" + blocks[firstUnlinked].index +
-        " — the previous hash it stored no longer matches the block before it";
+        ": the previous hash it stored no longer matches the block before it";
     } else if (!anyUnmined) {
       statusEl.dataset.state = "valid";
       statusText.textContent =
-        "Chain valid — every hash starts with " + difficulty +
+        "Chain valid: every hash starts with " + difficulty +
         " zero" + (difficulty === 1 ? "" : "s") + " and every link matches";
     } else {
       statusEl.dataset.state = "idle";
       statusText.textContent =
-        "Not mined yet — no hash starts with " + difficulty +
+        "Not mined yet: no hash starts with " + difficulty +
         " zero" + (difficulty === 1 ? "" : "s") + " so far";
     }
   }
@@ -220,7 +220,7 @@
     var nonce = 0;
 
     /* Re-point at the block before it, then search. Mining is the only thing
-       that rewrites a stored link — which is why fixing a tampered chain has
+       that rewrites a stored link - which is why fixing a tampered chain has
        to be done one block at a time, in order. */
     relink(i);
 
@@ -233,7 +233,7 @@
        around under the reader. The live counter lives in the block card,
        where its width cannot move anything else. */
     statusText.textContent =
-      "Mining block #" + block.index + " — searching for a hash that starts with " +
+      "Mining block #" + block.index + ": searching for a hash that starts with " +
       difficulty + " zero" + (difficulty === 1 ? "" : "s");
 
     mining = { cancelled: false };

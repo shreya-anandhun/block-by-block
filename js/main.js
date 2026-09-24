@@ -1,5 +1,5 @@
 /* ==========================================================================
-   main.js — page behaviour
+   main.js - page behaviour
    --------------------------------------------------------------------------
    Theme, navigation, scroll spy, reveal-on-scroll, the era tabs, the myth
    cards and the annotated contract. Everything degrades gracefully: with
@@ -101,7 +101,7 @@
   window.addEventListener("scroll", onScroll, { passive: true });
 
   /* ----------------------------------------------------------------------
-     3. Scroll spy — highlights the nav link and the progress rail
+     3. Scroll spy - highlights the nav link and the progress rail
      ---------------------------------------------------------------------- */
 
   var sections = Array.prototype.slice.call(document.querySelectorAll("[data-section], #top"));
@@ -159,10 +159,40 @@
   }
 
   /* ----------------------------------------------------------------------
+     4b. Hero numbers count up once they are on screen
+     ---------------------------------------------------------------------- */
+
+  var counters = Array.prototype.slice.call(document.querySelectorAll(".count[data-to]"));
+  function runCount(el) {
+    var to = +el.dataset.to, from = +(el.dataset.from || 0), start = null, dur = 1400;
+    function frame(ts) {
+      if (!start) start = ts;
+      var p = Math.min(1, (ts - start) / dur);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(from + (to - from) * eased));
+      if (p < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+  if (!reduceMotion.matches && "IntersectionObserver" in window) {
+    var counterSeen = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        counterSeen.unobserve(e.target);
+        setTimeout(function () { runCount(e.target); }, 900);
+      });
+    }, { threshold: 0.4 });
+    counters.forEach(function (c) { counterSeen.observe(c); });
+  }
+
+  /* ----------------------------------------------------------------------
      5. Era tabs (Web1 / Web2 / Web3)
      ---------------------------------------------------------------------- */
 
   var tabs = Array.prototype.slice.call(document.querySelectorAll(".era__tab"));
+  var tabList = document.querySelector(".era__tabs");
+  var eraBox = document.querySelector(".era");
+  var bubbles = Array.prototype.slice.call(document.querySelectorAll(".bubble"));
 
   function selectTab(tab, focus) {
     tabs.forEach(function (other) {
@@ -171,8 +201,52 @@
       other.tabIndex = selected ? 0 : -1;
       document.getElementById(other.getAttribute("aria-controls")).hidden = !selected;
     });
+
+    /* Fill the timeline rail up to the selected era, and light its bubble. */
+    var index = tabs.indexOf(tab);
+    if (tabList) tabList.style.setProperty("--progress", tabs.length > 1 ? index / (tabs.length - 1) : 1);
+    bubbles.forEach(function (bubble) {
+      bubble.classList.toggle("is-active", bubble.dataset.target === tab.id);
+    });
+
     if (focus) tab.focus();
   }
+
+  /* The header bubbles double as shortcuts to their era. */
+  bubbles.forEach(function (bubble) {
+    bubble.addEventListener("click", function () {
+      var tab = document.getElementById(bubble.dataset.target);
+      if (!tab) return;
+      selectTab(tab, false);
+      if (eraBox) {
+        var rect = eraBox.getBoundingClientRect();
+        if (rect.top > window.innerHeight * 0.7 || rect.bottom < 0) {
+          eraBox.scrollIntoView({ behavior: reduceMotion.matches ? "auto" : "smooth", block: "start" });
+        }
+      }
+    });
+  });
+
+  /* A colour ripple from the point that was pressed. */
+  function addRipple(el, event) {
+    if (reduceMotion.matches) return;
+    var rect = el.getBoundingClientRect();
+    var size = Math.max(rect.width, rect.height) * 2;
+    var x = (event.clientX || rect.left + rect.width / 2) - rect.left - size / 2;
+    var y = (event.clientY || rect.top + rect.height / 2) - rect.top - size / 2;
+    var ripple = document.createElement("span");
+    ripple.className = "ripple";
+    ripple.setAttribute("aria-hidden", "true");
+    ripple.style.width = ripple.style.height = size + "px";
+    ripple.style.left = x + "px";
+    ripple.style.top = y + "px";
+    el.appendChild(ripple);
+    setTimeout(function () { ripple.remove(); }, 700);
+  }
+
+  tabs.concat(bubbles).forEach(function (el) {
+    el.addEventListener("pointerdown", function (event) { addRipple(el, event); });
+  });
 
   tabs.forEach(function (tab, index) {
     tab.addEventListener("click", function () { selectTab(tab, false); });
@@ -191,6 +265,152 @@
   if (tabs.length) {
     var initial = tabs.filter(function (t) { return t.getAttribute("aria-selected") === "true"; })[0];
     selectTab(initial || tabs[0], false);
+  }
+
+  /* ----------------------------------------------------------------------
+     5b. The Big 6 - click a card to open its explanation; click again to close
+     ---------------------------------------------------------------------- */
+
+  var conceptCards = Array.prototype.slice.call(document.querySelectorAll(".concept[data-topic]"));
+  var stage = document.getElementById("conceptStage");
+  var stageClose = document.getElementById("stageClose");
+  var conceptsGrid = document.getElementById("conceptsGrid");
+  var narrow = window.matchMedia("(max-width: 60rem)");
+  var activeCard = null;
+
+  /* On phones the explainer opens directly under the tapped card;
+     on wider screens it opens under the grid. */
+  function placeStage() {
+    if (!stage) return;
+    if (narrow.matches && activeCard) activeCard.insertAdjacentElement("afterend", stage);
+    else if (conceptsGrid && stage.previousElementSibling !== conceptsGrid) conceptsGrid.insertAdjacentElement("afterend", stage);
+  }
+
+  function markCards() {
+    conceptCards.forEach(function (c) {
+      var on = c === activeCard;
+      c.classList.toggle("is-active", on);
+      c.setAttribute("aria-expanded", String(on));
+    });
+  }
+
+  function closeConcept() {
+    activeCard = null;
+    markCards();
+    if (stage) stage.hidden = true;
+  }
+
+  function openConcept(card) {
+    if (!stage) return;
+    if (card === activeCard) { closeConcept(); return; }
+    activeCard = card;
+    markCards();
+    Array.prototype.forEach.call(stage.querySelectorAll(".stage__pane"), function (pane) {
+      pane.hidden = pane.dataset.topic !== card.dataset.topic;
+    });
+    var wasHidden = stage.hidden;
+    stage.hidden = false;
+    if (wasHidden) { stage.style.animation = "none"; void stage.offsetWidth; stage.style.animation = ""; }
+    placeStage();
+
+    /* Bring the whole explanation on screen without making the reader scroll. */
+    requestAnimationFrame(function () {
+      var headerH = 80;
+      if (narrow.matches) {
+        /* phones: keep the tapped card at the top, explanation right below it */
+        var cardTop = card.getBoundingClientRect().top;
+        window.scrollTo({ top: window.scrollY + cardTop - headerH, behavior: reduceMotion.matches ? "auto" : "smooth" });
+        return;
+      }
+      var rect = stage.getBoundingClientRect();
+      if (rect.bottom > window.innerHeight || rect.top < headerH) {
+        var target = window.scrollY + rect.bottom - window.innerHeight + 16;
+        if (rect.height > window.innerHeight - headerH) target = window.scrollY + rect.top - headerH;
+        window.scrollTo({ top: target, behavior: reduceMotion.matches ? "auto" : "smooth" });
+      }
+    });
+  }
+
+  conceptCards.forEach(function (card) {
+    card.addEventListener("click", function () { openConcept(card); });
+    card.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openConcept(card); }
+    });
+    /* golden light follows the pointer inside the card */
+    card.addEventListener("pointermove", function (event) {
+      var rect = card.getBoundingClientRect();
+      card.style.setProperty("--mx", (event.clientX - rect.left) + "px");
+      card.style.setProperty("--my", (event.clientY - rect.top) + "px");
+    });
+  });
+
+  if (stageClose) {
+    stageClose.addEventListener("click", function () {
+      var card = activeCard;
+      closeConcept();
+      if (card) card.focus({ preventScroll: true });
+    });
+  }
+
+  placeStage();
+  if (typeof narrow.addEventListener === "function") narrow.addEventListener("change", placeStage);
+
+  /* ----------------------------------------------------------------------
+     5c. Cartoon laptop: dock, clock, click ripples, screen flash
+     ---------------------------------------------------------------------- */
+
+  var macScreen = document.getElementById("macScreen");
+  if (macScreen) {
+    var dockIcons = Array.prototype.slice.call(macScreen.querySelectorAll(".mac__dockicon"));
+    var flash = macScreen.querySelector(".mac__flash");
+
+    function syncDock() {
+      var sel = tabs.filter(function (t) { return t.getAttribute("aria-selected") === "true"; })[0];
+      dockIcons.forEach(function (d) { d.classList.toggle("is-active", !!sel && d.dataset.target === sel.id); });
+    }
+    function flashScreen() {
+      if (reduceMotion.matches || !flash) return;
+      flash.classList.remove("is-on"); void flash.offsetWidth; flash.classList.add("is-on");
+    }
+
+    dockIcons.forEach(function (d) {
+      d.addEventListener("click", function () {
+        var tab = document.getElementById(d.dataset.target);
+        if (tab) selectTab(tab, false);
+        d.classList.remove("is-bouncing"); void d.offsetWidth; d.classList.add("is-bouncing");
+        syncDock(); flashScreen();
+      });
+    });
+    tabs.forEach(function (t) { t.addEventListener("click", function () { syncDock(); flashScreen(); }); });
+    bubbles.forEach(function (b) { b.addEventListener("click", syncDock); });
+    syncDock();
+
+    macScreen.addEventListener("pointerdown", function (e) {
+      if (reduceMotion.matches) return;
+      var r = macScreen.getBoundingClientRect();
+      var dot = document.createElement("span");
+      dot.className = "mac__click";
+      dot.style.left = (e.clientX - r.left) + "px";
+      dot.style.top = (e.clientY - r.top) + "px";
+      macScreen.appendChild(dot);
+      setTimeout(function () { dot.remove(); }, 520);
+    });
+
+    /* drop the fade once a panel has been scrolled to the bottom */
+    Array.prototype.forEach.call(macScreen.querySelectorAll(".era__panel"), function (panel) {
+      function check() { panel.classList.toggle("is-end", panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 6); }
+      panel.addEventListener("scroll", check, { passive: true });
+      tabs.forEach(function (t) { t.addEventListener("click", function () { panel.scrollTop = 0; setTimeout(check, 30); }); });
+      dockIcons.forEach(function (d) { d.addEventListener("click", function () { panel.scrollTop = 0; setTimeout(check, 30); }); });
+      setTimeout(check, 50);
+    });
+
+    var clock = document.getElementById("macClock");
+    function tickClock() {
+      var d = new Date();
+      clock.textContent = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    }
+    if (clock) { tickClock(); setInterval(tickClock, 30000); }
   }
 
   /* ----------------------------------------------------------------------
