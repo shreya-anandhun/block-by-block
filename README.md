@@ -8,7 +8,7 @@ Built for the Track A challenge, with the optional wallet bonus implemented.
 
 ![Block by Block — the web you can own](assets/social-card.svg)
 
-**Live:** [shreya-anandhun.github.io/block-by-block](https://shreya-anandhun.github.io/block-by-block/) (GitHub Pages, deployed from the `version_1` branch) · **Stack:** hand-written HTML, CSS and
+**Live:** [shreya-anandhun.github.io/block-by-block](https://shreya-anandhun.github.io/block-by-block/) (GitHub Pages, deployed from the `main` branch) · **Stack:** hand-written HTML, CSS and
 vanilla JavaScript. No frameworks, no build step, no dependencies, no trackers.
 
 ---
