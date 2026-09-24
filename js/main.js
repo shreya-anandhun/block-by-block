@@ -93,6 +93,26 @@
     if (event.key === "Escape") closeNav();
   });
 
+  /* In-page links scroll to their section without leaving "#section" in the
+     address bar, so a copied URL always opens the page from the top. Typed
+     or shared deep links (e.g. /#flow) still work through the browser. */
+  document.addEventListener("click", function (event) {
+    var link = event.target.closest('a[href^="#"]');
+    if (!link || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    var id = link.getAttribute("href").slice(1);
+    var target = id === "top" ? document.body : document.getElementById(id);
+    if (!target) return;
+    event.preventDefault();
+    if (id === "top") {
+      window.scrollTo({ top: 0, behavior: reduceMotion.matches ? "auto" : "smooth" });
+    } else {
+      target.scrollIntoView({ behavior: reduceMotion.matches ? "auto" : "smooth", block: "start" });
+      if (target.hasAttribute("tabindex") || /^(a|button|input|select|textarea)$/i.test(target.tagName)) target.focus({ preventScroll: true });
+      else if (link.classList.contains("skip-link")) { target.setAttribute("tabindex", "-1"); target.focus({ preventScroll: true }); }
+    }
+    if (window.location.hash) history.replaceState(null, "", window.location.pathname + window.location.search);
+  });
+
   /* Hairline under the header only once the page has actually scrolled. */
   var onScroll = function () {
     header.dataset.stuck = String(window.scrollY > 8);
